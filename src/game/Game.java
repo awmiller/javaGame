@@ -11,9 +11,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +27,10 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import map.GameObject;
+import map.CharacterPiece;
+import map.GamePiece;
 import map.Map;
+import map.ObstaclePiece;
 import map.Tile;
 
 /**
@@ -34,6 +38,12 @@ import map.Tile;
  * @author awmil_000
  */
 public class Game extends JFrame implements Runnable{
+    static Dimension ZERO_VECTOR = new Dimension(0,0);
+    static AffineTransform ZERO_ROTATION = new AffineTransform();
+
+    public static Rectangle getRectCollider(Dimension origin, Dimension size) {
+        return new Rectangle(origin.width,origin.height,size.width,size.height);
+    }
     
     private Thread thread;
     
@@ -42,28 +52,38 @@ public class Game extends JFrame implements Runnable{
     MapView camera;
     static final int TILES_PER_DIMENSION = 20;
     static final Dimension SCREENSIZE = new Dimension(20,20);
+    static final char[] controls1 = {'w','a','s','d',' '};
     
     public Game(int sqrtMapTiles){   
         //gameMap stores persistant world data
         //constructor creates a square map with the given side length
         gameMap = new Map(SCREENSIZE);
         
-        GameObject gob1 = new GameObject(
+        GamePiece gob1 = new ObstaclePiece(
                 (BufferedImage) getSprite("res/island1.png"), 
-                new Dimension(40,40)
+                new Dimension(200,200)
         );
         gameMap.add(gob1);
         
         bimg = (BufferedImage) getSprite("res/island2.png");
         
-        GameObject gob2 = new GameObject( bimg,
-                new Dimension(20,20)
+        GamePiece gob2 = new ObstaclePiece( bimg,
+                new Dimension(300,200)
         );
         gameMap.add(gob2);
         
+        bimg = (BufferedImage) getSprite("res/TankBlueHeavy.gif");
+        
+        KeyController player1Controller = new KeyController(controls1);
+        GamePiece player1 = new CharacterPiece(bimg,player1Controller,new Dimension(0,0));
+        
+        player1 = gameMap.add(player1);
         //camera is a view into the gameMap
         //currently this should show the whole map
         camera = new MapView(gameMap);
+        
+        player1.addObserver(gameMap);
+        gameMap.addObserver(camera);
                 
         add(camera);
         setSize(camera.getDimens());
@@ -71,13 +91,14 @@ public class Game extends JFrame implements Runnable{
         setTitle("Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        addKeyListener(new KeyController());
+        addKeyListener(player1Controller);
     }
     
     
     public static void main(String args[]) {
         JFrame runner = new Game(TILES_PER_DIMENSION);
         runner.setVisible(true); 
+        runner.setFocusable(true);
     }
 
     @Override
@@ -94,5 +115,14 @@ public class Game extends JFrame implements Runnable{
         }
         return img;
     }
+    
+    public static Dimension add(Dimension d1,Dimension d2){
+        Dimension result = new Dimension(
+                d1.width+d2.width,
+                d1.height+d2.height
+        );
+        return result;
+    }
 
 }
+

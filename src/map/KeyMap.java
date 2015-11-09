@@ -5,17 +5,13 @@
  */
 package map;
 
-import java.util.ArrayList;
+import com.sun.glass.events.KeyEvent;
+import javafx.scene.input.KeyCode;
 
 /**
  *
  * @author awmil_000
  */
-class MapCell {
-    ArrayList<GamePiece> contents;
-    MapTile background;
-    public MapCell(int TileId){
-        background = new MapTile(TileId);
-        contents = new ArrayList();
-    }
+class KeyMap {
+    
 }

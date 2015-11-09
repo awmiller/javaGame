@@ -11,15 +11,19 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.JPanel;
-import map.GameObject;
+import map.GamePiece;
 import map.Map;
 
 /**
- *
+ * TODO: this should draw to a buffered image instead of panel so subviews may be drawn
+ * TODO: implement minimap with getScaledInstance()
+ * TODO: do all work in @Overide paint()
  * @author awmil_000
  */
-public class MapView extends JPanel {
+public class MapView extends JPanel implements Observer{
 
     private GameController gControl;
     private Map map;
@@ -36,12 +40,12 @@ public class MapView extends JPanel {
         setSize(dimens);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
-        drawView(g);
-    }
+//    @Override
+//    protected void paintComponent(Graphics g) {
+//        super.paintComponent(g);
+//        Graphics2D g2d = (Graphics2D) g.create();
+//        drawView(g);
+//    }
 
     public Graphics2D drawView(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
@@ -59,18 +63,18 @@ public class MapView extends JPanel {
 
     public Graphics2D drawObjects(Graphics2D g2d) {
         //copy contents so we can modify it            
-        ArrayList<GameObject> drawables = new ArrayList<>(map.getObjects());
+        ArrayList<GamePiece> drawables = new ArrayList<>(map.getObjects());
 
         //recursively draws everything in rastor scan order
         while (drawables.size() > 0) {
-            GameObject obj = drawables.remove(0);
+            GamePiece obj = drawables.remove(0);
             recurseDraw(obj, drawables, g2d);
         }
 
         return g2d;
     }
 
-    private void recurseDraw(GameObject obj, ArrayList<GameObject> drawables, Graphics2D g2d) {
+    private void recurseDraw(GamePiece obj, ArrayList<GamePiece> drawables, Graphics2D g2d) {
         /**
          * iterate over all the elements and remove elements that would draw
          * first if the element does draw before object, run this algorithm
@@ -79,7 +83,7 @@ public class MapView extends JPanel {
          */
         for (int i = 0; i < drawables.size();) {
             if (drawables.get(i).drawsBefore(obj)) {
-                GameObject first = drawables.remove(i);
+                GamePiece first = drawables.remove(i);
                 recurseDraw(first, drawables, g2d);
             }
             else  i++;
@@ -92,4 +96,18 @@ public class MapView extends JPanel {
         obj.draw(g2d);
 
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        repaint();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        drawView(g);
+    }
+    
+    
 }

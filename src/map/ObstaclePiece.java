@@ -6,16 +6,14 @@
 package map;
 
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
-/**
- *
- * @author awmil_000
- */
-public class GameEvent {
-      protected int type;
+
+public class ObstaclePiece extends GamePiece {
+
+    public ObstaclePiece(BufferedImage image, Dimension location) {
+        super(image, location);
+        rigid = true;
+    }
     
-    public static final int MOVE_THIS_PIECE = 0;
-    public static final int ATTACK_EVENT = 1;
-   
 }

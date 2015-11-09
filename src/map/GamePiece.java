@@ -7,68 +7,67 @@ package map;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.Observable;
 import java.util.Observer;
+import game.Game;
 
 /**
  *
  * @author awmil_000
  */
-public class GameObject implements Observer{
+public abstract class GamePiece extends Observable{
     
-    private BufferedImage Image;
-
-    private Dimension Location;   
+    protected boolean rigid = false;
+    
+    protected BufferedImage Image;
+    protected Dimension Location;
     public Dimension getLocation() {
         return Location;
     }
     
-    private Dimension size;
+    protected Dimension size;
     public Dimension getSize() {
         return size;
     }
     
-    private boolean dispose;
+    protected boolean dispose;
     public boolean disposable(){return dispose;}
     
-    public GameObject(BufferedImage image,Dimension location){
+    public GamePiece(BufferedImage image,Dimension location){
         Image = image;
         Location = location;
         dispose = false;
         size = new Dimension(Image.getHeight(),Image.getWidth());
     }
- 
-
-    @Override
-    public void update(Observable o, Object arg) {
-        GameEvent ge = (GameEvent)arg;
-        switch(ge.getType()){
-            case GameEvent.KEY_TYPE:
-                
-                break;
-            case GameEvent.PLOT_TYPE:
-                
-                break;
-        }
-    }
     
-    public boolean isColliding(GameObject other){
+    public boolean isColliding(GamePiece other){
         //is distance between < 2R
         //subclasses should override for better behavior
         return false;
     }
 
-    public boolean drawsBefore(GameObject obj) {
-        return
-        !((this.Location.height>obj.Location.height) || 
-                ((this.Location.width > obj.Location.width)&&
-                    (this.Location.height == obj.Location.height)));
+    public boolean drawsBefore(GamePiece obj) {
+        return false;//by default draw in order
     }
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(Image,Location.width, Location.height,(ImageObserver)null);
     }
+
+    boolean isRigid() {
+        return rigid;
+    }
+
+    boolean isColliding(Rectangle R1) {
+        Rectangle thisbox = Game.getRectCollider(this.Location, this.size);
+        return thisbox.intersects(R1);
+    }
     
+    public interface PieceMapInterface{
+        
+    }
+
 }

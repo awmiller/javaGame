@@ -5,12 +5,13 @@
  */
 package game;
 
+import java.awt.event.KeyAdapter;
+
 /**
  *
  * @author awmil_000
  */
-class Controller {
-    
-    
-    
+public interface Controller {  
+    public void onMove(MoveEvent direction);
+    public void onAttack(AttackEvent Ae);
 }

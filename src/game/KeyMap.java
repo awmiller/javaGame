@@ -3,17 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package map;
-
-import java.awt.event.KeyEvent;
+package game;
 
 /**
  *
  * @author awmil_000
  */
-interface Controller {
-    public void recieveKeyCode(KeyEvent ke);
-    public void recieveGameEvent(GameEvent ge);
+class KeyMap{
+    public KeyMap(String keys){
+        
+    }
 }
-
-
