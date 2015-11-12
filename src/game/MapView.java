@@ -8,6 +8,7 @@ package game;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -28,6 +29,8 @@ public class MapView extends JPanel implements Observer{
     private GameController gControl;
     private Map map;
     private Dimension dimens;
+    private BufferedImage world;
+    private GamePiece player;
 
     public Dimension getDimens() {
         return dimens;
@@ -49,53 +52,55 @@ public class MapView extends JPanel implements Observer{
 
     public Graphics2D drawView(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
-        g2d = (Graphics2D) map.drawWorld(g2d);
-        g2d = drawObjects(g2d);
+//        g2d = (Graphics2D) map.drawWorld(g2d);
+        g2d.drawImage(map.getBackgroundImage(),0,0,null);
+        g2d = map.drawObjects(g2d);
         return g2d;
     }
 
-    public MapView(Map m, Dimension d) {
+    public MapView(Map m, Dimension d, GamePiece snap) {
         super();
         map = m;
         dimens = d;
         setSize(d);
+        player = snap;
     }
 
-    public Graphics2D drawObjects(Graphics2D g2d) {
-        //copy contents so we can modify it            
-        ArrayList<GamePiece> drawables = new ArrayList<>(map.getObjects());
-
-        //recursively draws everything in rastor scan order
-        while (drawables.size() > 0) {
-            GamePiece obj = drawables.remove(0);
-            recurseDraw(obj, drawables, g2d);
-        }
-
-        return g2d;
-    }
-
-    private void recurseDraw(GamePiece obj, ArrayList<GamePiece> drawables, Graphics2D g2d) {
-        /**
-         * iterate over all the elements and remove elements that would draw
-         * first if the element does draw before object, run this algorithm
-         * again to make sure that the remaining objects draw in order
-         *
-         */
-        for (int i = 0; i < drawables.size();) {
-            if (drawables.get(i).drawsBefore(obj)) {
-                GamePiece first = drawables.remove(i);
-                recurseDraw(first, drawables, g2d);
-            }
-            else  i++;
-        }
-        /**
-         * now that drawables does not contain any elemts that draw before obj
-         * we can proceed to draw obj
-         *
-         */
-        obj.draw(g2d);
-
-    }
+//    public Graphics2D drawObjects(Graphics2D g2d) {
+//        //copy contents so we can modify it            
+//        ArrayList<GamePiece> drawables = new ArrayList<>(map.getObjects());
+//
+//        //recursively draws everything in rastor scan order
+//        while (drawables.size() > 0) {
+//            GamePiece obj = drawables.remove(0);
+//            recurseDraw(obj, drawables, g2d);
+//        }
+//
+//        return g2d;
+//    }
+//
+//    private void recurseDraw(GamePiece obj, ArrayList<GamePiece> drawables, Graphics2D g2d) {
+//        /**
+//         * iterate over all the elements and remove elements that would draw
+//         * first if the element does draw before object, run this algorithm
+//         * again to make sure that the remaining objects draw in order
+//         *
+//         */
+//        for (int i = 0; i < drawables.size();) {
+//            if (drawables.get(i).drawsBefore(obj)) {
+//                GamePiece first = drawables.remove(i);
+//                recurseDraw(first, drawables, g2d);
+//            }
+//            else  i++;
+//        }
+//        /**
+//         * now that drawables does not contain any elemts that draw before obj
+//         * we can proceed to draw obj
+//         *
+//         */
+//        obj.draw(g2d);
+//
+//    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -107,6 +112,8 @@ public class MapView extends JPanel implements Observer{
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g.create();
         drawView(g);
+//        world = new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);
+//        this.paintAll(world.createGraphics());
     }
     
     

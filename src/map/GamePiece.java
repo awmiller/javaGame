@@ -43,10 +43,10 @@ public abstract class GamePiece extends Observable{
         size = new Dimension(Image.getHeight(),Image.getWidth());
     }
     
-    public boolean isColliding(GamePiece other){
-        //is distance between < 2R
-        //subclasses should override for better behavior
-        return false;
+
+    public boolean isColliding(GamePiece other) {
+        int distance = Game.distance(this.Location,other.Location);
+        return distance<(this.radius()+other.radius());
     }
 
     public boolean drawsBefore(GamePiece obj) {
@@ -54,7 +54,7 @@ public abstract class GamePiece extends Observable{
     }
 
     public void draw(Graphics2D g2d) {
-        g2d.drawImage(Image,Location.width, Location.height,(ImageObserver)null);
+        g2d.drawImage(Image,Location.width-size.width/2, Location.height-size.height/2,(ImageObserver)null);
     }
 
     boolean isRigid() {
@@ -64,6 +64,10 @@ public abstract class GamePiece extends Observable{
     boolean isColliding(Rectangle R1) {
         Rectangle thisbox = Game.getRectCollider(this.Location, this.size);
         return thisbox.intersects(R1);
+    }
+
+    int radius() {
+        return size.height/2;
     }
     
     public interface PieceMapInterface{

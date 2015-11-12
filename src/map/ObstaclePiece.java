@@ -14,6 +14,5 @@ public class ObstaclePiece extends GamePiece {
     public ObstaclePiece(BufferedImage image, Dimension location) {
         super(image, location);
         rigid = true;
-    }
-    
+    }   
 }

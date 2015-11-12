@@ -38,11 +38,30 @@ import map.Tile;
  * @author awmil_000
  */
 public class Game extends JFrame implements Runnable{
-    static Dimension ZERO_VECTOR = new Dimension(0,0);
-    static AffineTransform ZERO_ROTATION = new AffineTransform();
+    public static Dimension ZERO_VECTOR = new Dimension(0,0);
+    public static AffineTransform ZERO_ROTATION = new AffineTransform();
+    public static int FRAMES_PER_SECOND = 60;
+    private static long FRAME_PERIOD = (1/Game.FRAMES_PER_SECOND)*100;
+    
+    public JFrame otherframe;
+    public JPanel otherpanel;
 
     public static Rectangle getRectCollider(Dimension origin, Dimension size) {
         return new Rectangle(origin.width,origin.height,size.width,size.height);
+    }
+
+    public static int distance(Dimension d1, Dimension d2) {
+        int dx = Math.abs(d1.width - d2.width);
+        int dy = Math.abs(d1.height - d2.height);
+        return dx+dy;
+    }
+
+    public static Dimension rotate(int magnitude, double heading) {
+        float x = magnitude;
+        float y = magnitude;
+        x = (float) -(x*Math.cos(heading));
+        y = (float) -(y*Math.sin(heading));
+        return new Dimension(Math.round(x),Math.round(y));
     }
     
     private Thread thread;
@@ -53,36 +72,44 @@ public class Game extends JFrame implements Runnable{
     static final int TILES_PER_DIMENSION = 20;
     static final Dimension SCREENSIZE = new Dimension(20,20);
     static final char[] controls1 = {'w','a','s','d',' '};
+    static final char[] controls2 = {'i','j','k','l','b'};
+            KeyController player1Controller = new KeyController(controls1);
+        GamePiece player1;
+        
+           KeyController player2Controller = new KeyController(controls2);
+        GamePiece player2;
+        
     
     public Game(int sqrtMapTiles){   
         //gameMap stores persistant world data
         //constructor creates a square map with the given side length
         gameMap = new Map(SCREENSIZE);
         
-        GamePiece gob1 = new ObstaclePiece(
-                (BufferedImage) getSprite("res/island1.png"), 
-                new Dimension(200,200)
-        );
-        gameMap.add(gob1);
+//        GamePiece gob1 = new ObstaclePiece(
+//                (BufferedImage) getSprite("res/island1.png"), 
+//                new Dimension(200,200)
+//        );
+//        gameMap.add(gob1);
+//        
+//        bimg = (BufferedImage) getSprite("res/island2.png");
+//        
+//        GamePiece gob2 = new ObstaclePiece( bimg,
+//                new Dimension(300,200)
+//        );
+//        gameMap.add(gob2);
         
-        bimg = (BufferedImage) getSprite("res/island2.png");
-        
-        GamePiece gob2 = new ObstaclePiece( bimg,
-                new Dimension(300,200)
-        );
-        gameMap.add(gob2);
-        
-        bimg = (BufferedImage) getSprite("res/TankBlueHeavy.gif");
-        
-        KeyController player1Controller = new KeyController(controls1);
-        GamePiece player1 = new CharacterPiece(bimg,player1Controller,new Dimension(0,0));
-        
+        bimg = (BufferedImage) getSprite("res/tank1_strip60.png");
+        player1 = new CharacterPiece(bimg,player1Controller,new Dimension(300,300));
+        player2 = new CharacterPiece(bimg,player2Controller,new Dimension(600,600));
         player1 = gameMap.add(player1);
+        
+ 
+        player2 = gameMap.add(player2);
+        
         //camera is a view into the gameMap
         //currently this should show the whole map
         camera = new MapView(gameMap);
         
-        player1.addObserver(gameMap);
         gameMap.addObserver(camera);
                 
         add(camera);
@@ -92,6 +119,19 @@ public class Game extends JFrame implements Runnable{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         addKeyListener(player1Controller);
+        addKeyListener(player2Controller);
+        
+//        otherpanel = new JPanel();
+//        otherpanel.setSize(300, 300);
+//        
+//        otherframe.add(otherpanel);
+//        otherframe.setSize(310,310);
+//
+//        otherframe.setTitle("Frame");
+//        otherframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        otherframe.setLocationRelativeTo(null);
+//        otherframe.addKeyListener(player1Controller);
+//        otherframe.addKeyListener(player2Controller);
     }
     
     
@@ -99,13 +139,28 @@ public class Game extends JFrame implements Runnable{
         JFrame runner = new Game(TILES_PER_DIMENSION);
         runner.setVisible(true); 
         runner.setFocusable(true);
+//        ((Game)runner).otherframe.setVisible(true);
+//        ((Game)runner).otherframe.setFocusable(true);
+        Thread game = new Thread((Runnable) runner);
+        game.start();
     }
 
+    int ping =0;
     @Override
     public void run() {
+        while(true){
+            
+            camera.repaint();
+            
+        try {
+            Thread.sleep(Game.FRAME_PERIOD);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
     }
     
-    public Image getSprite(String url)
+    public static Image getSprite(String url)
     {
         Image img = new BufferedImage(40,40,BufferedImage.TYPE_INT_RGB);
         try {

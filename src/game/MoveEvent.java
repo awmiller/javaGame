@@ -32,4 +32,9 @@ import static map.GameEvent.MOVE_THIS_PIECE;
             type = GameEvent.MOVE_THIS_PIECE;
             vector = Game.ZERO_VECTOR;
         }
+        
+        public static MoveEvent MoveUp = new MoveEvent(MoveEvent.UP_MOVE);
+        public static MoveEvent MoveDown = new MoveEvent(MoveEvent.DOWN_MOVE); 
+        public static MoveEvent RotateLeft = new MoveEvent(MoveEvent.LEFT_ROTATE);
+        public static MoveEvent RotateRight = new MoveEvent(MoveEvent.RIGHT_ROTATE);
     }

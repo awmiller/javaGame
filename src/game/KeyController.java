@@ -34,29 +34,50 @@ public class KeyController extends KeyAdapter{
         {
             char code =e.getKeyChar();
             if(code==UP_CHAR){
-                    eventQueue.add(new MoveEvent(MoveEvent.UP_MOVE));
+                if(!eventQueue.contains(MoveEvent.MoveUp))
+                    eventQueue.add(MoveEvent.MoveUp);
             } else if(code==DOWN_CHAR){
-                    eventQueue.add(new MoveEvent(MoveEvent.DOWN_MOVE));
+                if(!eventQueue.contains(MoveEvent.MoveDown))
+                    eventQueue.add(MoveEvent.MoveDown);
             } else if(code==LEFT_CHAR){
-                    eventQueue.add(new MoveEvent(MoveEvent.LEFT_ROTATE));
+                if(!eventQueue.contains(MoveEvent.RotateLeft))
+                    eventQueue.add(MoveEvent.RotateLeft);
             } else if(code==RIGHT_CHAR){
-                    eventQueue.add(new MoveEvent(MoveEvent.RIGHT_ROTATE));
+                if(!eventQueue.contains(MoveEvent.RotateRight))
+                    eventQueue.add(MoveEvent.RotateRight);
             } else if(code==FIRE_CHAR){
                     eventQueue.add(new AttackEvent());
             }
-            mModel.onEvent();
-            eventQueue.clear();
+            //mModel.onEvent();
+//            System.out.println("KeyPressed!"+ e.getKeyChar());
         }
 
 
         @Override
         public void keyReleased(KeyEvent e)
         {
-            System.out.println("KeyReleased!"+ e.getKeyChar());
+            char code =e.getKeyChar();
+            if(code==UP_CHAR){
+                if(eventQueue.contains(MoveEvent.MoveUp))
+                    eventQueue.remove(MoveEvent.MoveUp);
+            } else if(code==DOWN_CHAR){
+                if(eventQueue.contains(MoveEvent.MoveDown))
+                    eventQueue.remove(MoveEvent.MoveDown);
+            } else if(code==LEFT_CHAR){
+                if(eventQueue.contains(MoveEvent.RotateLeft))
+                    eventQueue.remove(MoveEvent.RotateLeft);
+            } else if(code==RIGHT_CHAR){
+                if(eventQueue.contains(MoveEvent.RotateRight))
+                    eventQueue.remove(MoveEvent.RotateRight);
+            } else if(code==FIRE_CHAR){
+                    eventQueue.remove(new AttackEvent());
+            }else{
+                mModel.onEvent();  
+            }
+//            System.out.println("KeyReleased!"+ e.getKeyChar());
         }
 
     public void attach(ControlModelInterface cmi) {
-       
             mModel = cmi;
     }
         
@@ -69,4 +90,6 @@ public class KeyController extends KeyAdapter{
         private final char LEFT_CHAR;
         private final char RIGHT_CHAR;
         private final char FIRE_CHAR;
+        
+        
     }

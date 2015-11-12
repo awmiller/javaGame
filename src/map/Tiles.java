@@ -14,8 +14,7 @@ import map.Tile;
  * @author awmil_000
  */
 public final class Tiles {
-    public static Tile waterTile;
-    public static Tile lavaTile;
+    public static Tile groundTile;
     
     private static ArrayList<Tile> all;
     public static int STANDARD_WIDTH;
@@ -23,13 +22,13 @@ public final class Tiles {
     
     static{
         System.out.print(Paths.get("").toAbsolutePath().toString());
-        waterTile = new Tile("res/water.png");
-        lavaTile = new Tile("res/lava.png");
+        groundTile = new Tile("res/Background.bmp");
+//        lavaTile = new Tile("res/lava.png");
         all = new ArrayList();
-        all.add(waterTile);
-        all.add(lavaTile);
-        STANDARD_WIDTH = waterTile.img.getWidth();
-        STANDARD_HEIGHT = waterTile.img.getHeight();
+        all.add(groundTile);
+//        all.add(lavaTile);
+        STANDARD_WIDTH = groundTile.img.getWidth();
+        STANDARD_HEIGHT = groundTile.img.getHeight();
     }
     
     public static Tile getRandom() {
