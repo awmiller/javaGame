@@ -40,8 +40,8 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 60;
-    private static long FRAME_PERIOD = (1/Game.FRAMES_PER_SECOND)*100;
+    public static int FRAMES_PER_SECOND = 120;
+    private static double FRAME_PERIOD = (1000/Game.FRAMES_PER_SECOND);
     
     public JFrame otherframe;
     public JPanel otherpanel;
@@ -69,7 +69,7 @@ public class Game extends JFrame implements Runnable{
     BufferedImage bimg;
     Map gameMap;
     MapView camera;
-    static final int TILES_PER_DIMENSION = 20;
+    static final int TILES_PER_DIMENSION = 10;
     static final Dimension SCREENSIZE = new Dimension(20,20);
     static final char[] controls1 = {'w','a','s','d',' '};
     static final char[] controls2 = {'i','j','k','l','b'};
@@ -108,7 +108,7 @@ public class Game extends JFrame implements Runnable{
         
         //camera is a view into the gameMap
         //currently this should show the whole map
-        camera = new MapView(gameMap);
+        camera = new MapView(gameMap,new Dimension(310,310),player1);
         
         gameMap.addObserver(camera);
                 
@@ -145,15 +145,14 @@ public class Game extends JFrame implements Runnable{
         game.start();
     }
 
-    int ping =0;
+    long ping =0;
     @Override
     public void run() {
-        while(true){
-            
+        while(true){            
             camera.repaint();
-            
         try {
-            Thread.sleep(Game.FRAME_PERIOD);
+            Thread.sleep((long) Game.FRAME_PERIOD);            
+            
         } catch (InterruptedException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }

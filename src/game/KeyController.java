@@ -49,7 +49,7 @@ public class KeyController extends KeyAdapter{
                     eventQueue.add(new AttackEvent());
             }
             //mModel.onEvent();
-//            System.out.println("KeyPressed!"+ e.getKeyChar());
+            //System.out.println("KeyPressed!"+ e.getKeyChar());
         }
 
 

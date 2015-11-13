@@ -36,12 +36,12 @@ public class MapView extends JPanel implements Observer{
         return dimens;
     }
 
-    MapView(Map gameMap) {
-        super();
-        map = gameMap;
-        dimens = gameMap.getCorner();
-        setSize(dimens);
-    }
+//    MapView(Map gameMap) {
+//        super();
+//        map = gameMap;
+//        dimens = gameMap.getCorner();
+//        setSize(dimens);
+//    }
 
 //    @Override
 //    protected void paintComponent(Graphics g) {
@@ -52,18 +52,34 @@ public class MapView extends JPanel implements Observer{
 
     public Graphics2D drawView(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
-//        g2d = (Graphics2D) map.drawWorld(g2d);
+//        
+//        world.flush();
+//        Graphics2D world2d = world.createGraphics();
+//        world2d.drawImage(map.getBackgroundImage(),0,0,null);
+//        map.drawObjects(world2d);
+//        world2d.dispose();
+//        BufferedImage scale = 
+//                world.getSubimage(
+//                        player.getLocation().width - (dimens.width/2), 
+//                        player.getLocation().height-(dimens.height/2), 
+//                        dimens.width,dimens.height);
+//        
+//        g2d.drawImage(scale,0,0,null);
+//        
         g2d.drawImage(map.getBackgroundImage(),0,0,null);
-        g2d = map.drawObjects(g2d);
+        map.drawObjects(g2d);
+        
         return g2d;
     }
 
     public MapView(Map m, Dimension d, GamePiece snap) {
         super();
         map = m;
-        dimens = d;
-        setSize(d);
+//        dimens = d;
+        dimens = map.getCorner();
+        setSize(dimens);
         player = snap;
+        world =new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);
     }
 
 //    public Graphics2D drawObjects(Graphics2D g2d) {
