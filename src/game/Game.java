@@ -145,16 +145,18 @@ public class Game extends JFrame implements Runnable{
         game.start();
     }
 
-    long ping =0;
+    long ping =System.nanoTime();
     @Override
     public void run() {
         while(true){            
             camera.repaint();
         try {
             Thread.sleep((long) Game.FRAME_PERIOD);            
-            
+            long t =System.nanoTime();
+            System.out.printf("\nFrame Rate %f", 1000000000/((float)(t - ping)));
+            ping =t;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.print(ex);
         }
       }
     }

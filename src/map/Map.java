@@ -125,12 +125,12 @@ public class Map extends Observable implements Observer{
         for(GamePiece other : contents){
             if(other.isRigid() && (other!=gamePiece)){
                 if(other.isColliding(gamePiece)){
-                    System.out.print("COLLISION!\n");
+//                    System.out.print("COLLISION!\n");
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
                     if(other.isColliding(gamePiece)){//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
-                        System.out.print("STUCK!\n");
+//                        System.out.print("STUCK!\n");
                         gamePiece.Location = newLocation;
                     }
                 }
