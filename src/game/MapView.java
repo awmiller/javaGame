@@ -49,25 +49,54 @@ public class MapView extends JPanel implements Observer{
 //        Graphics2D g2d = (Graphics2D) g.create();
 //        drawView(g);
 //    }
-
+    long ping =System.nanoTime();
     public Graphics2D drawView(Graphics g) {
+                    
         Graphics2D g2d = (Graphics2D) g.create();
-//        
-//        world.flush();
-//        Graphics2D world2d = world.createGraphics();
+        
+        long t = System.nanoTime();
+        float d1 = ((float)(t -ping))/1000000;
+        
+//        world = map.getBackgroundImage();
+        
+        Graphics2D world2d = world.createGraphics();
+        
+        map.drawWorld(world2d);
+        
 //        world2d.drawImage(map.getBackgroundImage(),0,0,null);
-//        map.drawObjects(world2d);
-//        world2d.dispose();
-//        BufferedImage scale = 
-//                world.getSubimage(
-//                        player.getLocation().width - (dimens.width/2), 
-//                        player.getLocation().height-(dimens.height/2), 
-//                        dimens.width,dimens.height);
+        
+        
+        t = System.nanoTime();
+        float d2 = ((float)(t-ping))/1000000-d1;
 //        
-//        g2d.drawImage(scale,0,0,null);
+        map.drawObjects(world2d);
+        world2d.dispose();
+        BufferedImage scale = 
+                world.getSubimage(
+                        player.getLocation().width - (dimens.width/2), 
+                        player.getLocation().height-(dimens.height/2), 
+                        dimens.width,dimens.height);
 //        
-        g2d.drawImage(map.getBackgroundImage(),0,0,null);
-        map.drawObjects(g2d);
+               
+        
+//        g2d.drawImage(map.getBackgroundImage(),0,0,null);
+        
+        
+        t = System.nanoTime();
+        float d3 = ((float)(t-ping))/1000000 -d2;
+        
+//        map.drawObjects(g2d);
+        g2d.drawImage(scale,0,0,null);     
+        
+        t = System.nanoTime();
+        float d4 = ((float)(t-ping))/1000000-d3;
+        
+        System.out.printf(
+                "\nFrame Rate %fHz\nD1-%1.2fus\nD2-%1.2fus\nD3-%1.2fus\nD4-%1.2fus",
+                1000000000/((float)(t - ping)),
+                d1,d2,d3,d4
+                );
+            ping = t;
         
         return g2d;
     }
@@ -75,8 +104,8 @@ public class MapView extends JPanel implements Observer{
     public MapView(Map m, Dimension d, GamePiece snap) {
         super();
         map = m;
-//        dimens = d;
-        dimens = map.getCorner();
+        dimens = d;
+//        dimens = map.getCorner();
         setSize(dimens);
         player = snap;
         world =new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);

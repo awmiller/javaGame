@@ -74,7 +74,7 @@ public class Map extends Observable implements Observer{
         }
     }
     
-    public Image getBackgroundImage(){
+    public BufferedImage getBackgroundImage(){
         return bimg;
     }
     

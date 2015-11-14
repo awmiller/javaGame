@@ -40,7 +40,7 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 120;
+    public static int FRAMES_PER_SECOND = 40;
     private static double FRAME_PERIOD = (1000/Game.FRAMES_PER_SECOND);
     
     public JFrame otherframe;
@@ -108,7 +108,7 @@ public class Game extends JFrame implements Runnable{
         
         //camera is a view into the gameMap
         //currently this should show the whole map
-        camera = new MapView(gameMap,new Dimension(310,310),player1);
+        camera = new MapView(gameMap,new Dimension(300,300),player1);
         
         gameMap.addObserver(camera);
                 
@@ -145,16 +145,12 @@ public class Game extends JFrame implements Runnable{
         game.start();
     }
 
-    long ping =System.nanoTime();
     @Override
     public void run() {
         while(true){            
             camera.repaint();
         try {
-            Thread.sleep((long) Game.FRAME_PERIOD);            
-            long t =System.nanoTime();
-            System.out.printf("\nFrame Rate %f", 1000000000/((float)(t - ping)));
-            ping =t;
+            Thread.sleep((long) Game.FRAME_PERIOD);          
         } catch (InterruptedException ex) {
             System.out.print(ex);
         }
