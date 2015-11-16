@@ -44,7 +44,7 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 40;
+    public static int FRAMES_PER_SECOND = 60;
     private static double FRAME_PERIOD_MILLIS = (1000/Game.FRAMES_PER_SECOND);
     private long framePeriod;
     public static boolean DRAW_DEBUG_LINES = false;
@@ -164,11 +164,13 @@ public class Game extends JFrame implements Runnable{
     public void run() {
         while(true){     
             long ping = System.currentTimeMillis();
+            gameMap.moveAll();
             camera.repaint();
         try {
             Thread.sleep((long) framePeriod);
             ping = System.currentTimeMillis() - ping;
             framePeriod += (FRAME_PERIOD_MILLIS - ping);
+            framePeriod = framePeriod > 0 ? framePeriod : 0;
             System.out.printf("Frame Rate: %f\n", (float)(1000/((float)framePeriod)));
         } catch (InterruptedException ex) {
             System.out.print(ex);

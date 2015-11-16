@@ -21,6 +21,7 @@ import game.Game;
 public abstract class GamePiece extends Observable{
     
     protected boolean rigid = false;
+    protected boolean hasMoved = false;
     
     protected BufferedImage Image;
     protected Dimension Location;
@@ -43,7 +44,6 @@ public abstract class GamePiece extends Observable{
         size = new Dimension(Image.getHeight(),Image.getWidth());
     }
     
-
     public boolean isColliding(GamePiece other) {
         int distance = Game.distance(this.Location,other.Location);
         return distance<(this.radius()+other.radius());
@@ -72,6 +72,11 @@ public abstract class GamePiece extends Observable{
     
     public interface PieceMapInterface{
         
+    }
+    
+    
+    public void move() {
+       
     }
 
 }

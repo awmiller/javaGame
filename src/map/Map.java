@@ -133,6 +133,12 @@ public class Map extends Observable implements Observer{
         movePieceIfAble(cp,new MoveEvent(cp.NextMove));
         
     }
+    
+    public void moveAll(){
+        for(GamePiece gp: contents){
+            gp.move();
+        }
+    }
 
     public void movePieceIfAble(GamePiece gamePiece, MoveEvent moveEvent) {        
         Dimension newLocation = Game.add(gamePiece.Location,moveEvent.vector);
