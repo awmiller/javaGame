@@ -63,7 +63,7 @@ public abstract class GamePiece extends Observable{
 
     boolean isColliding(Rectangle R1) {
         Rectangle thisbox = Game.getRectCollider(this.Location, this.size);
-        return thisbox.intersects(R1);
+        return thisbox.intersects(R1);// || R1.contains(thisbox) || thisbox.contains(R1);
     }
 
     int radius() {

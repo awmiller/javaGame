@@ -5,6 +5,7 @@
  */
 package map;
 
+import game.Game;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,13 +23,13 @@ public class Tile {
     public BufferedImage img;
     public String src;
     public Tile(String path){
-        src = path;
+        URL url = getClass().getResource(path);
         try {
-            img = ImageIO.read(new File(src));
+            img = ImageIO.read(url);
+            System.out.print(url);
         } catch (IOException ex) {
             Logger.getLogger(Tile.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
     
     @Override

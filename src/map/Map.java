@@ -33,88 +33,104 @@ import javax.swing.JComponent;
  */
 public class Map extends Observable implements Observer{
     
+    public void attachCamera(MapView mv){
+        this.addObserver(mv);
+    }
+    
     ArrayList<GamePiece> contents;
-    Dimension corner;
-    public Dimension getCorner() {
-        return new Dimension(corner.width+Tiles.STANDARD_WIDTH,corner.height+Tiles.STANDARD_HEIGHT);
-    }
-    
-    Coordinates[] subview = new Coordinates[2];
-    ArrayList<Tile> tiles;
-    Graphics2D MapGraphic;
-    BufferedImage bimg;
-    
-    public Map(Dimension d){
-        tiles = new ArrayList();
-        int area = d.height*d.width;
-        corner = new Dimension(d.width*Tiles.STANDARD_WIDTH,d.height*Tiles.STANDARD_HEIGHT);
-        for(int i = 0; i < area;i++){
-            tiles.add(Tiles.getRandom());
-        }   
-        contents = new ArrayList<>();
-        bimg = new BufferedImage(corner.width,corner.height,BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gimg = bimg.createGraphics();
-        gimg = (Graphics2D) drawWorld(gimg);
-        System.out.printf("Map Size: %d,%d", corner.height, corner.width);
-        System.out.printf("Map Image Size: %d,%d", bimg.getHeight(),bimg.getWidth());
-        BufferedImage wall = (BufferedImage) Game.getSprite("res/Wall1.gif");
-        for(int i =0; i< corner.height;)
-        {
-            for(int j=0; j < corner.width;)
-            {
-                if( (i==0) || (j==0) || 
-                        (i>(corner.height-wall.getHeight())) ||
-                        (j>(corner.width -wall.getWidth() ))
-                  ){
-                    contents.add(new ObstaclePiece(wall,new Dimension(j,i)));
-                }
-                j+= wall.getWidth();
-            }
-            i+=wall.getHeight();
-        }
-    }
-    
-    public BufferedImage getBackgroundImage(){
-        return bimg;
-    }
     
     public GamePiece add(GamePiece go){
         contents.add(go);
         go.addObserver(this);
         return go;
     }
+    /**
+     * get a constant reference to contents
+     * @return final contents
+     */
+    public final ArrayList<GamePiece> getObjects(){
+        return contents;
+    }
     
-    public Graphics drawWorld(Graphics g){
+    /**
+     * bottom right corner of the map
+     */
+    Dimension corner;
+    
+    public Dimension getCorner() {
+        return new Dimension(corner.width,corner.height);
+    }
+    
+    
+    BufferedImage background;    
+    /**
+     * getter for a static backdrop
+     * @return 
+     */
+    public BufferedImage getBackgroundImage(){
+        return background;
+    }
+    /**
+     * Draws tiles to a graphics object according to this object's dimensions
+     * @param g
+     * @param tiles
+     * @return 
+     */
+    public Graphics2D drawBackground(Graphics2D g, ArrayList<Tile> tiles){
         int i =0;
         for(int y = 0;y<corner.height;y+=Tiles.STANDARD_HEIGHT){
             for(int x = 0;x<corner.width;x+=Tiles.STANDARD_WIDTH){
-                ((Graphics2D)g).drawImage(tiles.get(i++).img, null, x, y);
+                g.drawImage(tiles.get(i++).img, null, x, y);
             }
         }
         
         return g;
     }
-
-    public final ArrayList<GamePiece> getObjects(){
-        return contents;
+    
+    public Map(Dimension d){
+        
+        /**
+         * Initialize data structures
+         */
+        contents = new ArrayList<>();
+        corner = new Dimension(d.width*Tiles.STANDARD_WIDTH,d.height*Tiles.STANDARD_HEIGHT);
+        printout = Game.getCompatImage(printout, corner.width,corner.height);
+        /**
+         * Create the backdrop tiles
+         */
+        ArrayList<Tile> tiles;
+        tiles = new ArrayList();
+        /**
+         * add tiles to static image
+         */
+        int area = d.height*d.width;
+        for(int i = 0; i < area;i++){
+            tiles.add(Tiles.getRandom());
+        }   
+        
+        /**
+         * Setup backdrop image
+         */
+        background = Game.getCompatImage(background,corner.width,corner.height);
+        Graphics2D gimg = background.createGraphics();
+        drawBackground(gimg, tiles);
+        //metrics
+        System.out.printf("Map Size: %d,%d", corner.height, corner.width);
+        System.out.printf("Map Image Size: %d,%d", background.getHeight(),background.getWidth());
+        
+        /**
+         * Create all the walls
+         */
+        createWalls();
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-//        GameEvent gpe = (GameEvent)arg;
-//        switch(gpe.type){
-//            case GameEvent.MOVE_THIS_PIECE:
-//                movePieceIfAble((GamePiece)o,(MoveEvent)arg);
-//                break;
-//            case GameEvent.ATTACK_EVENT:
-//                attackIfAble((GamePiece)o,(AttackEvent)arg);
-//        }
+    public void update(Observable o, Object arg) { 
+        
+        if(! (o instanceof GamePiece)) return;
         
         CharacterPiece cp = (CharacterPiece) o;
         movePieceIfAble(cp,new MoveEvent(cp.NextMove));
-//        this.setChanged();
-//        this.notifyObservers();
-//        this.clearChanged();
         
     }
 
@@ -125,12 +141,10 @@ public class Map extends Observable implements Observer{
         for(GamePiece other : contents){
             if(other.isRigid() && (other!=gamePiece)){
                 if(other.isColliding(gamePiece)){
-//                    System.out.print("COLLISION!\n");
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
                     if(other.isColliding(gamePiece)){//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
-//                        System.out.print("STUCK!\n");
                         gamePiece.Location = newLocation;
                     }
                 }
@@ -154,11 +168,12 @@ public class Map extends Observable implements Observer{
         
         return (top<0)||(bot>corner.height)||(left<0)||(right>corner.width);
     }
-    
-    public void attachCamera(MapView mv){
-        this.addObserver(mv);
-    }
 
+    /**
+     * Draws all objects to the specified graphics
+     * @param g2d
+     * @return 
+     */
     public Graphics2D drawObjects(Graphics2D g2d)  {
         //copy contents so we can modify it            
         ArrayList<GamePiece> drawables = new ArrayList<>(contents);
@@ -169,10 +184,51 @@ public class Map extends Observable implements Observer{
             recurseDraw(obj, drawables, g2d);
         }
         
-        for(GamePiece gp: contents){
-            for(GamePiece ogp: contents){
-                if(gp!=ogp && (gp.getClass()==CharacterPiece.class) && (ogp.getClass()==CharacterPiece.class)){
-                    g2d.drawLine(gp.Location.width, gp.Location.height, ogp.Location.width, ogp.Location.height);
+        if (Game.DRAW_DEBUG_LINES) {
+            for (GamePiece gp : contents) {
+                for (GamePiece ogp : contents) {
+                    if (gp != ogp && (gp.getClass() == CharacterPiece.class) && (ogp.getClass() == CharacterPiece.class)) {
+                        g2d.drawLine(gp.Location.width, gp.Location.height, ogp.Location.width, ogp.Location.height);
+                    }
+                }
+            }
+        }
+
+        return g2d;
+    }
+    
+    /**
+     * Draws Objects to a graphic within the specified window
+     * @param g2d the graphics canvas
+     * @param location top-left corner specification, relative to this map
+     * @param size total pixel dimensions of the window
+     * @return the modified graphics object
+     */
+    synchronized public Graphics2D drawObjects(Graphics2D g2d, Dimension location, Dimension size)  {
+        //copy contents so we can modify it            
+        ArrayList<GamePiece> drawables = new ArrayList<>(contents);
+        
+        
+        Rectangle R1 = Game.getRectCollider(location, size);
+        
+        for(GamePiece gp : contents) {
+            if(gp.isColliding(R1)){
+                drawables.add(gp);
+            } 
+        }
+
+        //recursively draws everything in rastor scan order
+        while (drawables.size() > 0) {
+            GamePiece obj = drawables.remove(0);
+            recurseDraw(obj, drawables, g2d);
+        }
+        
+        if (Game.DRAW_DEBUG_LINES) {
+            for (GamePiece gp : contents) {
+                for (GamePiece ogp : contents) {
+                    if (gp != ogp && (gp.getClass() == CharacterPiece.class) && (ogp.getClass() == CharacterPiece.class)) {
+                        g2d.drawLine(gp.Location.width, gp.Location.height, ogp.Location.width, ogp.Location.height);
+                    }
                 }
             }
         }
@@ -202,5 +258,33 @@ public class Map extends Observable implements Observer{
          */
         obj.draw(g2d);
 
+    }
+
+    private void createWalls() {
+        BufferedImage wall = (BufferedImage) Game.getSprite("/res/Wall1.gif");
+        for(int i =0; i< corner.height;)
+        {
+            for(int j=0; j < corner.width;)
+            {
+                if( (i==0) || (j==0) || 
+                        (i==(corner.height-wall.getWidth())) ||
+                        (j==(corner.width -wall.getHeight()))
+                  ){
+                    contents.add(new ObstaclePiece(wall,new Dimension(j,i)));
+                }
+                j+= wall.getWidth();
+            }
+            i+=wall.getHeight();
+        }
+    }
+    
+    private BufferedImage printout;
+    
+    public final BufferedImage printObjectsImage(){
+//        printout = Game.getCompatImage(printout, corner.width, corner.height);
+        Graphics2D g2d = printout.createGraphics();
+        drawObjects(g2d);
+        g2d.dispose();
+        return printout;
     }
 }

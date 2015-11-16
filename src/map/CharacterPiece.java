@@ -23,7 +23,7 @@ import java.util.Observable;
 public class CharacterPiece extends GamePiece {
     
     protected int Health;
-    private double RADIANS_PER_FRAME = Math.PI/(2*Game.FRAMES_PER_SECOND);
+    private double RADIANS_PER_FRAME = Math.PI/(8*Game.FRAMES_PER_SECOND);
     public int getHealth() {
         return Health;
     }

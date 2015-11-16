@@ -5,9 +5,6 @@
  */
 package map;
 
-import com.sun.glass.events.KeyEvent;
-import javafx.scene.input.KeyCode;
-
 /**
  *
  * @author awmil_000

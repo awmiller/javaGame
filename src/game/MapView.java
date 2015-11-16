@@ -5,6 +5,7 @@
  */
 package game;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,11 +27,11 @@ import map.Map;
  */
 public class MapView extends JPanel implements Observer{
 
-    private GameController gControl;
     private Map map;
     private Dimension dimens;
     private BufferedImage world;
     private GamePiece player;
+    private Color transparent = new Color(255, 255, 255, 0);
 
     public Dimension getDimens() {
         return dimens;
@@ -52,51 +53,87 @@ public class MapView extends JPanel implements Observer{
     long ping =System.nanoTime();
     public Graphics2D drawView(Graphics g) {
                     
-        Graphics2D g2d = (Graphics2D) g.create();
+        Graphics2D g2d = (Graphics2D) g;
         
-        long t = System.nanoTime();
-        float d1 = ((float)(t -ping))/1000000;
         
-//        world = map.getBackgroundImage();
+        
+        Dimension ScreenClip = getRelativeScreenLocation();
+        
+//        int ScreenX =player.getLocation().width - (dimens.width/2);
+//        int ScreenY =player.getLocation().height- (dimens.height/2);
+//        Dimension ScreenLoc = new Dimension(ScreenX,ScreenY);
         
         Graphics2D world2d = world.createGraphics();
         
-        map.drawWorld(world2d);
+        world2d.setBackground(transparent);
+        world2d.clearRect(ScreenClip.width, ScreenClip.height, dimens.width, dimens.height);
+        
+//        g2d.drawImage(map.printImage(), 0, 0, null);
+//        world = map.printImage();
+        
+//        world = map.getBackgroundImage();
+        
+//        Graphics2D world2d = world.createGraphics();
+        
+//        map.drawWorld(world2d);
         
 //        world2d.drawImage(map.getBackgroundImage(),0,0,null);
         
         
-        t = System.nanoTime();
-        float d2 = ((float)(t-ping))/1000000-d1;
+        
+//        long t = System.nanoTime();
+//        float d1 = ((float)(t -ping))/1000000;
 //        
-        map.drawObjects(world2d);
-        world2d.dispose();
+//        map.drawObjects(world2d);
+//        world2d.dispose();
+        try{
         BufferedImage scale = 
-                world.getSubimage(
-                        player.getLocation().width - (dimens.width/2), 
-                        player.getLocation().height-(dimens.height/2), 
+                map.getBackgroundImage().getSubimage(
+                        ScreenClip.width, 
+                        ScreenClip.height, 
                         dimens.width,dimens.height);
-//        
-               
+
+//        t = System.nanoTime();
+//        float d2 = ((float)(t-ping))/1000000-d1;               
         
 //        g2d.drawImage(map.getBackgroundImage(),0,0,null);
         
-        
-        t = System.nanoTime();
-        float d3 = ((float)(t-ping))/1000000 -d2;
-        
 //        map.drawObjects(g2d);
         g2d.drawImage(scale,0,0,null);     
+                }catch(Exception e){
+         System.out.print(e.getMessage());
+         throw(e);
+        }
+//        t = System.nanoTime();
+//        float d3 = ((float)(t-ping))/1000000 -d2;
         
-        t = System.nanoTime();
-        float d4 = ((float)(t-ping))/1000000-d3;
+        map.drawObjects(world2d,ScreenClip,dimens);
+        world2d.dispose();
+                try{
+         BufferedImage scale2 = 
+                world.getSubimage(
+                        ScreenClip.width, 
+                        ScreenClip.height, 
+                        dimens.width,dimens.height);
         
-        System.out.printf(
-                "\nFrame Rate %fHz\nD1-%1.2fus\nD2-%1.2fus\nD3-%1.2fus\nD4-%1.2fus",
-                1000000000/((float)(t - ping)),
-                d1,d2,d3,d4
-                );
-            ping = t;
+        
+        
+//        t = System.nanoTime();
+//        float d4 = ((float)(t-ping))/1000000-d3;
+        
+        
+        g2d.drawImage(scale2,0,0,null); 
+                        }catch(Exception e){
+         System.out.print(e.getMessage());
+         
+         throw(e);
+        }
+//        System.out.printf(
+//                "\nFrame Rate %fHz\nD1-%1.2fus\nD2-%1.2fus\nD3-%1.2fus\nD4-%1.2fus",
+//                1000000000/((float)(t - ping)),
+//                d1,d2,d3,d4
+//                );
+//            ping = t;
         
         return g2d;
     }
@@ -108,7 +145,8 @@ public class MapView extends JPanel implements Observer{
 //        dimens = map.getCorner();
         setSize(dimens);
         player = snap;
-        world =new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);
+        world = Game.getCompatImage(world, map.getCorner().width, map.getCorner().height);
+//        world =new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);
     }
 
 //    public Graphics2D drawObjects(Graphics2D g2d) {
@@ -155,10 +193,31 @@ public class MapView extends JPanel implements Observer{
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        Graphics2D g2d = (Graphics2D) g.create();
+//        Graphics2D g2d = (Graphics2D) g.create();
         drawView(g);
 //        world = new BufferedImage(map.getCorner().width,map.getCorner().height,BufferedImage.TYPE_INT_ARGB);
 //        this.paintAll(world.createGraphics());
+    }
+
+    private Dimension getRelativeScreenLocation() {
+        int ScreenX =player.getLocation().width - (dimens.width/2);
+        int ScreenY =player.getLocation().height- (dimens.height/2);
+        int boundx = (map.getCorner().width-dimens.width);
+        int boundy = (map.getCorner().height-dimens.height);
+        
+        if(ScreenX < 1){
+            ScreenX = 0;
+        }
+        if(ScreenY < 1){
+            ScreenY = 0;
+        }
+        if(ScreenX > boundx){
+            ScreenX = boundx;
+        }
+        if(ScreenY > boundy){
+            ScreenY = boundy;
+        }
+        return new Dimension(ScreenX,ScreenY);
     }
     
     

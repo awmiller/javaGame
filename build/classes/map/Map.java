@@ -39,7 +39,6 @@ public class Map extends Observable implements Observer{
         return new Dimension(corner.width+Tiles.STANDARD_WIDTH,corner.height+Tiles.STANDARD_HEIGHT);
     }
     
-    Coordinates[] subview = new Coordinates[2];
     ArrayList<Tile> tiles;
     Graphics2D MapGraphic;
     BufferedImage bimg;
@@ -57,7 +56,7 @@ public class Map extends Observable implements Observer{
         gimg = (Graphics2D) drawWorld(gimg);
         System.out.printf("Map Size: %d,%d", corner.height, corner.width);
         System.out.printf("Map Image Size: %d,%d", bimg.getHeight(),bimg.getWidth());
-        BufferedImage wall = (BufferedImage) Game.getSprite("res/Wall1.gif");
+        BufferedImage wall = (BufferedImage) Game.getSprite("/res/Wall1.gif");
         for(int i =0; i< corner.height;)
         {
             for(int j=0; j < corner.width;)
@@ -74,7 +73,7 @@ public class Map extends Observable implements Observer{
         }
     }
     
-    public Image getBackgroundImage(){
+    public BufferedImage getBackgroundImage(){
         return bimg;
     }
     
@@ -125,12 +124,12 @@ public class Map extends Observable implements Observer{
         for(GamePiece other : contents){
             if(other.isRigid() && (other!=gamePiece)){
                 if(other.isColliding(gamePiece)){
-                    System.out.print("COLLISION!\n");
+//                    System.out.print("COLLISION!\n");
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
                     if(other.isColliding(gamePiece)){//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
-                        System.out.print("STUCK!\n");
+//                        System.out.print("STUCK!\n");
                         gamePiece.Location = newLocation;
                     }
                 }

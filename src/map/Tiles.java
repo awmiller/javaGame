@@ -22,7 +22,7 @@ public final class Tiles {
     
     static{
         System.out.print(Paths.get("").toAbsolutePath().toString());
-        groundTile = new Tile("res/Background.bmp");
+        groundTile = new Tile("/res/Background.bmp");
 //        lavaTile = new Tile("res/lava.png");
         all = new ArrayList();
         all.add(groundTile);
