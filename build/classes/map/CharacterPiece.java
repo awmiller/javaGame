@@ -23,7 +23,8 @@ import java.util.Observable;
 public class CharacterPiece extends GamePiece {
     
     protected int Health;
-    private double RADIANS_PER_FRAME = Math.PI/(2*Game.FRAMES_PER_SECOND);
+    private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
+    
     public int getHealth() {
         return Health;
     }
@@ -59,7 +60,7 @@ public class CharacterPiece extends GamePiece {
         super(image, location);
         mControlls = kc;
         mControlls.attach(mcmi);
-        speed = 10;
+        speed = 3;
         this.rigid =true;
     }
 
@@ -68,13 +69,16 @@ public class CharacterPiece extends GamePiece {
         //g2d.setColor(Color.BLUE);
         //g2d.drawOval(Location.width-radius()/2, Location.height-radius()/2, radius(),radius());
         
-        move();
+//        move();
+        if(hasMoved){
+        
         AffineTransformOp atxop = new AffineTransformOp(rotation,AffineTransformOp.TYPE_BILINEAR);
 //        move.translate(Location.width, Location.height);
         g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
         g2d.setColor(Color.RED);
         g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
-        
+        hasMoved = false;
+        }
     }
     
     
@@ -93,8 +97,10 @@ public class CharacterPiece extends GamePiece {
     
     int FrameCount = 0;
 
+    @Override
     public void move() {
 
+        hasMoved = true;
         NextMove = Game.ZERO_VECTOR;
         int move = 0;
 
@@ -110,20 +116,17 @@ public class CharacterPiece extends GamePiece {
             rotation.rotate(-RADIANS_PER_FRAME,size.width/2,size.height/2);
         }
 
-        if ((FrameCount++) > 5) {
-            FrameCount = 0;
-
-            if (mControlls.eventQueue.contains(MoveEvent.MoveUp)) {
-                setChanged();
-                move -= speed;
-            }
-            if (mControlls.eventQueue.contains(MoveEvent.MoveDown)) {
-                setChanged();
-                move += speed;
-            }
-
-            NextMove = Game.rotate(move, heading);
+        if (mControlls.eventQueue.contains(MoveEvent.MoveUp)) {
+            setChanged();
+            move -= speed;
         }
+        if (mControlls.eventQueue.contains(MoveEvent.MoveDown)) {
+            setChanged();
+            move += speed;
+        }
+
+        NextMove = Game.rotate(move, heading);
+
         notifyObservers();
         clearChanged();
     }

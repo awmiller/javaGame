@@ -19,11 +19,17 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
@@ -31,13 +37,30 @@ import javax.swing.JComponent;
  *
  * @author awmil_000
  */
-public class Map extends Observable implements Observer{
-    
-    public void attachCamera(MapView mv){
-        this.addObserver(mv);
-    }
+public class Map implements Observer{
+    private boolean hasMoved;
     
     ArrayList<GamePiece> contents;
+    ArrayList<String> ListLines = new ArrayList<>();
+    
+    static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
+    static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
+    
+    static{
+        int wd = wall1.getWidth();
+        int ht = wall1.getHeight();
+        wall1 = Game.getCompatImage(wall1, wd,ht);
+        wall2 = Game.getCompatImage(wall2, wd,ht);
+        Graphics2D g1 = wall1.createGraphics();
+        g1.drawImage((BufferedImage) Game.getSprite("/res/Wall1.gif"), 0,0, null);
+        g1.dispose();
+        
+        Graphics2D g2 = wall2.createGraphics();
+        g2.drawImage((BufferedImage) Game.getSprite("/res/Wall2.gif"), 0,0, null);
+        g2.dispose();
+    }
+    
+    private final BufferedReader source;
     
     public GamePiece add(GamePiece go){
         contents.add(go);
@@ -87,13 +110,18 @@ public class Map extends Observable implements Observer{
         return g;
     }
     
-    public Map(Dimension d){
+    public Map(String sourceFile) throws Exception{
+        Dimension d;
+        source = new BufferedReader(new FileReader(sourceFile));
+        readMapSource(source);
+        
+        d = new Dimension(ListLines.get(0).length(),ListLines.size());
         
         /**
          * Initialize data structures
          */
         contents = new ArrayList<>();
-        corner = new Dimension(d.width*Tiles.STANDARD_WIDTH,d.height*Tiles.STANDARD_HEIGHT);
+        corner = new Dimension(d.width*wall1.getWidth(),d.height*wall1.getHeight());
         printout = Game.getCompatImage(printout, corner.width,corner.height);
         /**
          * Create the backdrop tiles
@@ -138,6 +166,7 @@ public class Map extends Observable implements Observer{
         for(GamePiece gp: contents){
             gp.move();
         }
+        hasMoved = true;
     }
 
     public void movePieceIfAble(GamePiece gamePiece, MoveEvent moveEvent) {        
@@ -156,10 +185,6 @@ public class Map extends Observable implements Observer{
                 }
             }
         }
-        //if(!movesOutOfBounds(gamePiece,newLocation))
-        this.setChanged();
-        this.notifyObservers();
-        this.clearChanged();
     }
 
     private void attackIfAble(GamePiece gamePiece, AttackEvent attackEvent) {
@@ -267,30 +292,56 @@ public class Map extends Observable implements Observer{
     }
 
     private void createWalls() {
-        BufferedImage wall = (BufferedImage) Game.getSprite("/res/Wall1.gif");
-        for(int i =0; i< corner.height;)
+        
+        int fileProgress = 0;
+        
+        for(int i =0; (i< corner.height)&&(fileProgress < ListLines.size());)
         {
-            for(int j=0; j < corner.width;)
+            String line = ListLines.get(fileProgress);
+            int lineProgress = 0;
+            for(int j=0; (j < corner.width) && (lineProgress < line.length()) ;)
             {
-                if( (i==0) || (j==0) || 
-                        (i==(corner.height-wall.getWidth())) ||
-                        (j==(corner.width -wall.getHeight()))
-                  ){
-                    contents.add(new ObstaclePiece(wall,new Dimension(j,i)));
-                }
-                j+= wall.getWidth();
+                
+                char c = line.charAt(lineProgress);
+                lineProgress+=1;
+                if(c == 'w')
+                    contents.add(new ObstaclePiece(wall1,new Dimension(j,i)));
+                else if(c == 'W')
+                    contents.add(new ObstaclePiece(wall2,new Dimension(j,i)));
+                    
+
+                j+= wall1.getWidth();
             }
-            i+=wall.getHeight();
+            i+=wall1.getHeight();
+            fileProgress +=1;
         }
     }
     
     private BufferedImage printout;
     
+    private Color transparent = new Color(255, 255, 255, 0);
+    
     public final BufferedImage printObjectsImage(){
 //        printout = Game.getCompatImage(printout, corner.width, corner.height);
-        Graphics2D g2d = printout.createGraphics();
-        drawObjects(g2d);
-        g2d.dispose();
+        if(hasMoved){
+            Graphics2D g2d = printout.createGraphics();
+            g2d.setBackground(transparent);
+            //g2d.clearRect(0,0,corner.width, corner.height);// dimens.width, dimens.height);
+            g2d.drawImage(this.background, 0, 0, null);
+            drawObjects(g2d);
+            g2d.dispose();
+        }
         return printout;
+    }
+
+    private void readMapSource(BufferedReader source) {
+        try {
+            while(source.ready()){
+                String line = source.readLine();
+                ListLines.add(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Map.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

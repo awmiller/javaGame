@@ -5,6 +5,7 @@
  */
 package game;
 
+import java.awt.BorderLayout;
 import map.Tiles;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -22,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Observer;
@@ -44,7 +47,7 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 60;
+    public static int FRAMES_PER_SECOND = 40;
     private static double FRAME_PERIOD_MILLIS = (1000/Game.FRAMES_PER_SECOND);
     private long framePeriod;
     public static boolean DRAW_DEBUG_LINES = false;
@@ -80,7 +83,7 @@ public class Game extends JFrame implements Runnable{
     private Thread thread;
     
     Map gameMap;
-    MapView camera;
+    MapView camera1;
     static final int TILES_PER_DIMENSION = 10;
     static final Dimension SCREENSIZE = new Dimension(6,6);
     static final char[] controls1 = {'w','a','s','d',' '};
@@ -90,14 +93,23 @@ public class Game extends JFrame implements Runnable{
         
            KeyController player2Controller = new KeyController(controls2);
         GamePiece player2;
+    MapView camera2;
+    private final GamePanel gameView;
+    
         
     
     public Game(int sqrtMapTiles){   
         
         BufferedImage bimg;
-        //gameMap stores persistant world data
-        //constructor creates a square map with the given side length
-        gameMap = new Map(SCREENSIZE);
+        try {
+            //gameMap stores persistant world data
+            //constructor creates a square map with the given side length
+            
+            URL url = Game.class.getResource("/res/tank1.map");
+            gameMap = new Map(url.getFile());
+        } catch (Exception ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
 //        GamePiece gob1 = new ObstaclePiece(
 //                (BufferedImage) getSprite("res/island1.png"), 
@@ -122,12 +134,24 @@ public class Game extends JFrame implements Runnable{
         
         //camera is a view into the gameMap
         //currently this should show the whole map
-        camera = new MapView(gameMap,new Dimension(500,500),player1);
+        camera1 = new MapView(gameMap,new Dimension(500,500),player1);
         
-        gameMap.addObserver(camera);
-                
-        add(camera);
-        setSize(camera.getDimens());
+        camera2 = new MapView(gameMap,new Dimension(500,500),player2);
+        
+//        gameMap.addObserver(camera1);
+        
+//        otherpanel = new JPanel();
+        
+//        otherpanel.setSize(new Dimension(1000,500));
+//        otherpanel.add(camera1);
+//        otherpanel.add(camera2);
+//        this.getContentPane().add(otherpanel);
+        
+        gameView = new GamePanel(new Dimension(1000,500));
+        
+        add(gameView);
+        
+        setSize(new Dimension(1000,500));
 
         setTitle("Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -151,8 +175,9 @@ public class Game extends JFrame implements Runnable{
     
     public static void main(String args[]) {
         JFrame runner = new Game(TILES_PER_DIMENSION);
-        runner.setVisible(true); 
+//        runner.pack();
         runner.setFocusable(true);
+        runner.setVisible(true); 
 //        ((Game)runner).otherframe.setVisible(true);
 //        ((Game)runner).otherframe.setFocusable(true);
         Thread game = new Thread((Runnable) runner);
@@ -165,7 +190,9 @@ public class Game extends JFrame implements Runnable{
         while(true){     
             long ping = System.currentTimeMillis();
             gameMap.moveAll();
-            camera.repaint();
+//            camera1.repaint();
+//            camera2.repaint();
+            gameView.repaint();
         try {
             Thread.sleep((long) framePeriod);
             ping = System.currentTimeMillis() - ping;
@@ -176,6 +203,12 @@ public class Game extends JFrame implements Runnable{
             System.out.print(ex);
         }
       }
+    }
+    
+    Dimension offset = new Dimension(500,0);
+    public void paintEverthing(Graphics2D g2d){
+        camera1.drawView(g2d);
+        camera2.drawView(g2d,offset);
     }
     
     public static BufferedImage getSprite(String path)
@@ -208,6 +241,21 @@ public class Game extends JFrame implements Runnable{
         img = config.createCompatibleImage(wd, ht, Transparency.TRANSLUCENT);
         img.setAccelerationPriority(1);
         return img;
+    }
+    
+    private class GamePanel extends JPanel{
+        public GamePanel(Dimension size){
+            super();
+            setSize(size);
+        }
+        
+        @Override
+        public void paint(Graphics g){
+            Graphics2D g2d = (Graphics2D)g;
+            paintEverthing(g2d);
+            
+        }
+        
     }
 
 }

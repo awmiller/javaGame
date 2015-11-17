@@ -5,6 +5,7 @@
  */
 package map;
 
+import game.Game;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
