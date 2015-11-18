@@ -47,11 +47,13 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 80;
+    public static int FRAMES_PER_SECOND = 20;
     private static double FRAME_PERIOD_MILLIS = (1000/Game.FRAMES_PER_SECOND);
     private long framePeriod;
     public static boolean DRAW_DEBUG_LINES = false;
     static GraphicsConfiguration config;
+    MiniMap miniMap;
+    Dimension screenSplitLocation;
     
     static{
     GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -111,19 +113,6 @@ public class Game extends JFrame implements Runnable{
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-//        GamePiece gob1 = new ObstaclePiece(
-//                (BufferedImage) getSprite("res/island1.png"), 
-//                new Dimension(200,200)
-//        );
-//        gameMap.add(gob1);
-//        
-//        bimg = (BufferedImage) getSprite("res/island2.png");
-//        
-//        GamePiece gob2 = new ObstaclePiece( bimg,
-//                new Dimension(300,200)
-//        );
-//        gameMap.add(gob2);
-        
         bimg = (BufferedImage) getSprite("/res/tank1_strip60.png");
         player1 = new CharacterPiece(bimg,player1Controller,new Dimension(300,300));
         player2 = new CharacterPiece(bimg,player2Controller,new Dimension(600,600));
@@ -138,17 +127,12 @@ public class Game extends JFrame implements Runnable{
         
         camera2 = new MapView(gameMap,new Dimension(500,500),player2);
         
-//        gameMap.addObserver(camera1);
-        
-//        otherpanel = new JPanel();
-        
-//        otherpanel.setSize(new Dimension(1000,500));
-//        otherpanel.add(camera1);
-//        otherpanel.add(camera2);
-//        this.getContentPane().add(otherpanel);
-        
         gameView = new GamePanel(new Dimension(1000,500));
         
+        screenSplitLocation = new Dimension(500,500);
+        
+        miniMap = new MiniMap(gameMap,10);
+                
         add(gameView);
         
         setSize(new Dimension(1000,500));
@@ -158,18 +142,6 @@ public class Game extends JFrame implements Runnable{
         setLocationRelativeTo(null);
         addKeyListener(player1Controller);
         addKeyListener(player2Controller);
-        
-//        otherpanel = new JPanel();
-//        otherpanel.setSize(300, 300);
-//        
-//        otherframe.add(otherpanel);
-//        otherframe.setSize(310,310);
-//
-//        otherframe.setTitle("Frame");
-//        otherframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        otherframe.setLocationRelativeTo(null);
-//        otherframe.addKeyListener(player1Controller);
-//        otherframe.addKeyListener(player2Controller);
     }
     
     
@@ -207,8 +179,9 @@ public class Game extends JFrame implements Runnable{
     
     Dimension offset = new Dimension(500,0);
     public void paintEverthing(Graphics2D g2d){
-        camera1.drawView(g2d);
+        camera1.drawView(g2d,new Dimension(0,0));
         camera2.drawView(g2d,offset);
+        miniMap.draw(g2d,screenSplitLocation);
     }
     
     public static BufferedImage getSprite(String path)
@@ -251,6 +224,7 @@ public class Game extends JFrame implements Runnable{
         
         @Override
         public void paint(Graphics g){
+            super.paint(g);
             Graphics2D g2d = (Graphics2D)g;
             paintEverthing(g2d);
             

@@ -60,7 +60,7 @@ public class CharacterPiece extends GamePiece {
         super(image, location);
         mControlls = kc;
         mControlls.attach(mcmi);
-        speed = 3;
+        speed = 6;
         this.rigid =true;
     }
 
@@ -70,15 +70,15 @@ public class CharacterPiece extends GamePiece {
         //g2d.drawOval(Location.width-radius()/2, Location.height-radius()/2, radius(),radius());
         
 //        move();
-        if(hasMoved){
+//        if(hasMoved){
         
         AffineTransformOp atxop = new AffineTransformOp(rotation,AffineTransformOp.TYPE_BILINEAR);
 //        move.translate(Location.width, Location.height);
         g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
-        g2d.setColor(Color.RED);
-        g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
-        hasMoved = false;
-        }
+//        g2d.setColor(Color.RED);
+//        g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
+//        hasMoved = false;
+//        }
     }
     
     

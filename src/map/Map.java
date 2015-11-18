@@ -155,9 +155,15 @@ public class Map implements Observer{
     @Override
     public void update(Observable o, Object arg) { 
         
-        if(! (o instanceof GamePiece)) return;
+        if(! (o instanceof CharacterPiece)) return;
         
         CharacterPiece cp = (CharacterPiece) o;
+        
+        if(arg instanceof AttackEvent){
+            ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
+            add(pjtl);
+        }
+        
         movePieceIfAble(cp,new MoveEvent(cp.NextMove));
         
     }
@@ -181,6 +187,9 @@ public class Map implements Observer{
                     if(other.isColliding(gamePiece)){//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
                         gamePiece.Location = newLocation;
+                    }else{
+                        //Apply onCollide()
+                        other.onCollide(gamePiece);
                     }
                 }
             }
@@ -330,6 +339,7 @@ public class Map implements Observer{
             g2d.drawImage(this.background, 0, 0, null);
             drawObjects(g2d);
             g2d.dispose();
+            hasMoved = false;
         }
         return printout;
     }
@@ -343,5 +353,9 @@ public class Map implements Observer{
         } catch (IOException ex) {
             Logger.getLogger(Map.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void cleanUp() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

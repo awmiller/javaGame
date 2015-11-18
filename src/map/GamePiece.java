@@ -68,15 +68,14 @@ public abstract class GamePiece extends Observable{
 
     int radius() {
         return size.height/2;
-    }
-    
-    public interface PieceMapInterface{
-        
-    }
-    
+    }    
     
     public void move() {
        
+    }
+    
+    public void onCollide(GamePiece collider){
+        System.out.print("\n"+this.toString()+"Collided with " +collider.toString());
     }
 
 }
