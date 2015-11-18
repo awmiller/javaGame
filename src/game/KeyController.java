@@ -69,9 +69,7 @@ public class KeyController extends KeyAdapter{
             } else if(code==RIGHT_CHAR){
                 if(eventQueue.contains(MoveEvent.RotateRight))
                     eventQueue.remove(MoveEvent.RotateRight);
-            } else if(code==FIRE_CHAR){
-                    eventQueue.remove(AttackEvent.MissileAttack);
-            }else{
+            } else{
                 mModel.onEvent();  
             }
 //            System.out.println("KeyReleased!"+ e.getKeyChar());

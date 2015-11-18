@@ -22,6 +22,7 @@ public abstract class GamePiece extends Observable{
     
     protected boolean rigid = false;
     protected boolean hasMoved = false;
+    public Dimension NextMove = Game.ZERO_VECTOR;
     
     protected BufferedImage Image;
     protected Dimension Location;

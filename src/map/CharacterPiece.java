@@ -23,14 +23,16 @@ import java.util.Observable;
 
 public class CharacterPiece extends GamePiece {
     
-    protected int Health;
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
     
+    private int maxHealth = 40;
+    
+    protected int Health;
     public int getHealth() {
         return Health;
     }
 
-    protected int Power;
+    protected int Power = 5;
     public int getPower() {
         return Power;
     }
@@ -64,28 +66,29 @@ public class CharacterPiece extends GamePiece {
         mControlls.attach(mcmi);
         speed = 6;
         this.rigid =true;
+        Health = maxHealth;
     }
 
     @Override
     public void draw(Graphics2D g2d) {
-        //g2d.setColor(Color.BLUE);
-        //g2d.drawOval(Location.width-radius()/2, Location.height-radius()/2, radius(),radius());
-        
-//        move();
-//        if(hasMoved){
-        
+
         AffineTransformOp atxop = new AffineTransformOp(rotation,AffineTransformOp.TYPE_BILINEAR);
-//        move.translate(Location.width, Location.height);
+
         g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
-//        g2d.setColor(Color.RED);
+
+        float percent = Health/maxHealth;
+        int red = Math.round(255-(percent * 255));
+        int green = Math.round(percent*255);//
+        g2d.setColor(new Color(red,green,0,255));
+        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,10);
+//        g2d.draw(new Rectangle(Location.width-size.width/2, Location.height+size.height/2,Health,20));
 //        g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
-//        hasMoved = false;
-//        }
+
     }
     
     
  
-    public Dimension NextMove = Game.ZERO_VECTOR;
+    
     public AffineTransform rotation = new AffineTransform();
     private KeyController mControlls;
     private KeyController.ControlModelInterface mcmi = new KeyController.ControlModelInterface() {
@@ -134,13 +137,18 @@ public class CharacterPiece extends GamePiece {
         
         NextMove = Game.rotate(move, heading);
         
-        if(mControlls.eventQueue.contains(AttackEvent.MissileAttack) &&
-                (AttackCooldown ==0)){
-            AttackCooldown = Game.FRAMES_PER_SECOND;
-            notifyObservers(AttackEvent.MissileAttack);
-            clearChanged();
+        if(mControlls.eventQueue.contains(AttackEvent.MissileAttack)){
+            
+            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
+            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
+            if(AttackCooldown ==0){
+                AttackCooldown = Game.FRAMES_PER_SECOND;
+                setChanged();
+                notifyObservers(AttackEvent.MissileAttack);
+                clearChanged();
+                return;
+            }
         }
-
 
         notifyObservers();
         clearChanged();

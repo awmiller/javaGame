@@ -22,6 +22,7 @@ public abstract class GamePiece extends Observable{
     
     protected boolean rigid = false;
     protected boolean hasMoved = false;
+    public Dimension NextMove = Game.ZERO_VECTOR;
     
     protected BufferedImage Image;
     protected Dimension Location;
@@ -68,15 +69,14 @@ public abstract class GamePiece extends Observable{
 
     int radius() {
         return size.height/2;
-    }
-    
-    public interface PieceMapInterface{
-        
-    }
-    
+    }    
     
     public void move() {
        
+    }
+    
+    public void onCollide(GamePiece collider){
+        System.out.print("\n"+this.toString()+"Collided with " +collider.toString());
     }
 
 }

@@ -23,6 +23,7 @@ class MiniMap {
 
     public MiniMap(Map gameMap, int i) {
         scale = i;
+        mMap = gameMap;
         img = Game.getCompatImage(img,300,300);
         width = mMap.getCorner().width/scale;
         height = mMap.getCorner().height/scale;

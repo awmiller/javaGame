@@ -155,21 +155,27 @@ public class Map implements Observer{
     @Override
     public void update(Observable o, Object arg) { 
         
-        if(! (o instanceof CharacterPiece)) return;
+        if(o instanceof CharacterPiece){
         
-        CharacterPiece cp = (CharacterPiece) o;
-        
-        if(arg instanceof AttackEvent){
-            ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
-            add(pjtl);
+            CharacterPiece cp = (CharacterPiece) o;
+
+            if(arg instanceof AttackEvent){
+                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
+                add(pjtl);
+                System.out.print("\nProjectile Created!");
+            }
         }
         
-        movePieceIfAble(cp,new MoveEvent(cp.NextMove));
+        if(o instanceof GamePiece){
+            GamePiece gp = (GamePiece)o;
+            movePieceIfAble(gp,new MoveEvent(gp.NextMove));
+        }
         
     }
     
     public void moveAll(){
-        for(GamePiece gp: contents){
+        ArrayList<GamePiece> copy = new ArrayList<>(contents);
+        for(GamePiece gp: copy){
             gp.move();
         }
         hasMoved = true;
@@ -190,6 +196,7 @@ public class Map implements Observer{
                     }else{
                         //Apply onCollide()
                         other.onCollide(gamePiece);
+                        gamePiece.onCollide(other);
                     }
                 }
             }

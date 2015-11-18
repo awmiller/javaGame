@@ -47,7 +47,7 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 20;
+    public static int FRAMES_PER_SECOND = 30;
     private static double FRAME_PERIOD_MILLIS = (1000/Game.FRAMES_PER_SECOND);
     private long framePeriod;
     public static boolean DRAW_DEBUG_LINES = false;
@@ -135,7 +135,7 @@ public class Game extends JFrame implements Runnable{
                 
         add(gameView);
         
-        setSize(new Dimension(1000,500));
+        setSize(new Dimension(1035,540));
 
         setTitle("Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -165,19 +165,20 @@ public class Game extends JFrame implements Runnable{
 //            camera1.repaint();
 //            camera2.repaint();
             gameView.repaint();
+            gameMap.cleanUp();
         try {
             Thread.sleep((long) framePeriod);
             ping = System.currentTimeMillis() - ping;
             framePeriod += (FRAME_PERIOD_MILLIS - ping);
             framePeriod = framePeriod > 0 ? framePeriod : 0;
-            System.out.printf("Frame Rate: %f\n", (float)(1000/((float)framePeriod)));
+//            System.out.printf("Frame Rate: %f\n", (float)(1000/((float)framePeriod)));
         } catch (InterruptedException ex) {
             System.out.print(ex);
         }
       }
     }
     
-    Dimension offset = new Dimension(500,0);
+    Dimension offset = new Dimension(520,0);
     public void paintEverthing(Graphics2D g2d){
         camera1.drawView(g2d,new Dimension(0,0));
         camera2.drawView(g2d,offset);
