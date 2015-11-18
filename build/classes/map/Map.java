@@ -202,11 +202,7 @@ public class Map implements Observer{
             }
         }
     }
-
-    private void attackIfAble(GamePiece gamePiece, AttackEvent attackEvent) {
-        
-    }
-
+    
     private boolean movesOutOfBounds(GamePiece gamePiece, Dimension newLocation) {
         int top = newLocation.height;
         int bot = newLocation.height + gamePiece.size.height;
@@ -363,6 +359,16 @@ public class Map implements Observer{
     }
 
     public void cleanUp() {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<GamePiece> copy = new ArrayList<>(contents);
+        
+        for(GamePiece gp : copy){
+            if(gp.disposable()){
+                contents.remove(gp);
+                if(gp instanceof CharacterPiece)
+                    add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
+                else
+                    add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));
+            }
+        }
     }
 }

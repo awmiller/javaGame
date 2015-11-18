@@ -49,6 +49,7 @@ public class CharacterPiece extends GamePiece {
     public int takesDamage(int power){
         int damage = (power-Armor)>0?(power-Armor):0;
         Health -= damage;
+        if(Health <=0) dispose =true;
         return damage;
     }
     

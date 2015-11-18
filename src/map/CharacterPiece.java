@@ -25,6 +25,13 @@ public class CharacterPiece extends GamePiece {
     
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
     
+    int AttackSpeedDivider = 4;
+    int AttackBoostDuration = 0;
+    public void boostAttackSpeed(int duration){
+        AttackSpeedDivider = 8;
+        AttackBoostDuration = duration;
+    }
+    
     private int maxHealth = 40;
     
     protected int Health;
@@ -49,6 +56,7 @@ public class CharacterPiece extends GamePiece {
     public int takesDamage(int power){
         int damage = (power-Armor)>0?(power-Armor):0;
         Health -= damage;
+        if(Health <=0) dispose =true;
         return damage;
     }
     
@@ -113,6 +121,14 @@ public class CharacterPiece extends GamePiece {
         if(AttackCooldown >0){
             AttackCooldown--;
         }
+        
+        if(AttackBoostDuration > 0){
+            AttackBoostDuration--;
+            if(AttackBoostDuration<=0){
+                AttackSpeedDivider = 4;
+                AttackBoostDuration=0;
+            }
+        }
 
         if (mControlls.eventQueue.contains(MoveEvent.RotateRight)) {
             setChanged();
@@ -139,10 +155,10 @@ public class CharacterPiece extends GamePiece {
         
         if(mControlls.eventQueue.contains(AttackEvent.MissileAttack)){
             
-            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
-            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
+//            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
+//            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
             if(AttackCooldown ==0){
-                AttackCooldown = Game.FRAMES_PER_SECOND;
+                AttackCooldown = Game.FRAMES_PER_SECOND/AttackSpeedDivider;
                 setChanged();
                 notifyObservers(AttackEvent.MissileAttack);
                 clearChanged();
