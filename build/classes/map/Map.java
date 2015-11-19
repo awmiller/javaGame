@@ -186,7 +186,10 @@ public class Map implements Observer{
         Dimension oldLocation = new Dimension(gamePiece.Location);
         gamePiece.Location = newLocation;
         for(GamePiece other : contents){
-            if(other.isRigid() && (other!=gamePiece)){
+            
+            if(other==gamePiece)continue;
+            
+            if(other.isRigid()){
                 if(other.isColliding(gamePiece)){
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
@@ -198,6 +201,14 @@ public class Map implements Observer{
                         other.onCollide(gamePiece);
                         gamePiece.onCollide(other);
                     }
+                }
+            }else{ //Not Rigid
+                if(other.isColliding(gamePiece) &&
+                        (other instanceof PowerUpPiece)){
+                    
+                        //Apply onCollide() to pickups
+                        other.onCollide(gamePiece);
+                        gamePiece.onCollide(other);
                 }
             }
         }
@@ -304,31 +315,45 @@ public class Map implements Observer{
     }
 
     private void createWalls() {
-        
+
         int fileProgress = 0;
-        
-        for(int i =0; (i< corner.height)&&(fileProgress < ListLines.size());)
-        {
+
+        for (int i = 0; (i < corner.height) && (fileProgress < ListLines.size());) {
             String line = ListLines.get(fileProgress);
             int lineProgress = 0;
-            for(int j=0; (j < corner.width) && (lineProgress < line.length()) ;)
-            {
-                
-                char c = line.charAt(lineProgress);
-                lineProgress+=1;
-                if(c == 'w')
-                    contents.add(new ObstaclePiece(wall1,new Dimension(j,i)));
-                else if(c == 'W')
-                    contents.add(new ObstaclePiece(wall2,new Dimension(j,i)));
-                    
+            for (int j = 0; (j < corner.width) && (lineProgress < line.length());) {
 
-                j+= wall1.getWidth();
+                char c = line.charAt(lineProgress);
+                lineProgress += 1;
+                switch (c) {
+                    case 'w':
+                        contents.add(new ObstaclePiece(wall1, new Dimension(j, i)));
+                        break;
+                    case 'W':
+                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        break;
+                    case 'B':
+                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
+                                new Dimension(j, i),PowerUpPiece.POWER_BOUNCE));
+                        break;
+                    case 'M':
+                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        break;
+                    case 'S':
+                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        break;
+                    case 'T':
+                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        break;
+                }
+
+                j += wall1.getWidth();
             }
-            i+=wall1.getHeight();
-            fileProgress +=1;
+            i += wall1.getHeight();
+            fileProgress += 1;
         }
     }
-    
+
     private BufferedImage printout;
     
     private Color transparent = new Color(255, 255, 255, 0);
@@ -364,9 +389,10 @@ public class Map implements Observer{
         for(GamePiece gp : copy){
             if(gp.disposable()){
                 contents.remove(gp);
+                gp.onDispose();
                 if(gp instanceof CharacterPiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
-                else
+                else if(gp instanceof ProjectilePiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));
             }
         }

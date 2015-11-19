@@ -25,6 +25,13 @@ public class CharacterPiece extends GamePiece {
     
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
     
+    int AttackSpeedDivider = 4;
+    int AttackBoostDuration = 0;
+    public void boostAttackSpeed(int duration){
+        AttackSpeedDivider = 8;
+        AttackBoostDuration = duration;
+    }
+    
     private int maxHealth = 40;
     
     protected int Health;
@@ -32,6 +39,7 @@ public class CharacterPiece extends GamePiece {
         return Health;
     }
 
+    private int WeaponPowerDuration = 0;
     protected int Power = 5;
     public int getPower() {
         return Power;
@@ -77,11 +85,11 @@ public class CharacterPiece extends GamePiece {
 
         g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
 
-        float percent = Health/maxHealth;
-        int red = Math.round(255-(percent * 255));
-        int green = Math.round(percent*255);//
+        float percent = (float)Health/(float)maxHealth;
+        int red = Math.round(255 - (float)Math.pow(255, percent));
+        int green = Math.round((float)Math.pow(255, percent));//
         g2d.setColor(new Color(red,green,0,255));
-        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,10);
+        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
 //        g2d.draw(new Rectangle(Location.width-size.width/2, Location.height+size.height/2,Health,20));
 //        g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
 
@@ -114,6 +122,22 @@ public class CharacterPiece extends GamePiece {
         if(AttackCooldown >0){
             AttackCooldown--;
         }
+        
+        if(AttackBoostDuration > 0){
+            AttackBoostDuration--;
+            if(AttackBoostDuration<=0){
+                AttackSpeedDivider = 4;
+                AttackBoostDuration=0;
+            }
+        }
+        
+        if(WeaponPowerDuration > 0){
+            WeaponPowerDuration--;
+            if(WeaponPowerDuration <=0){
+                WeaponPowerDuration=0;
+                Power = 5;
+            }
+        }
 
         if (mControlls.eventQueue.contains(MoveEvent.RotateRight)) {
             setChanged();
@@ -140,10 +164,10 @@ public class CharacterPiece extends GamePiece {
         
         if(mControlls.eventQueue.contains(AttackEvent.MissileAttack)){
             
-            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
-            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
+//            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
+//            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
             if(AttackCooldown ==0){
-                AttackCooldown = Game.FRAMES_PER_SECOND;
+                AttackCooldown = Game.FRAMES_PER_SECOND/AttackSpeedDivider;
                 setChanged();
                 notifyObservers(AttackEvent.MissileAttack);
                 clearChanged();
@@ -154,5 +178,21 @@ public class CharacterPiece extends GamePiece {
         notifyObservers();
         clearChanged();
     }
+
+    @Override
+    public void onCollide(GamePiece collider) {
+        if(collider instanceof PowerUpPiece){
+            switch(((PowerUpPiece)collider).getType()){
+                case PowerUpPiece.POWER_BOUNCE:
+                    this.Power +=5;
+                    this.WeaponPowerDuration = Game.FRAMES_PER_SECOND*10;
+                    break;
+            }
+            collider.onCollide(this);
+        }
+        
+    }
+    
+    
 
 }

@@ -52,14 +52,19 @@ class ExplosionAnimation extends GamePiece {
     int FrameCount=0;
     int stripx =0;
     int stripinc;
+    static int FrameDivider = 12;
     
     @Override
     public void move() {
         
         FrameCount++;
-        if((FrameCount % (Game.FRAMES_PER_SECOND/4))==0){
+        if((FrameCount % (Game.FRAMES_PER_SECOND/FrameDivider))==0){
             stripx += stripinc;
-            this.Image = strip.getSubimage(stripx, 0, stripinc,strip.getHeight());
+            if(stripx < strip.getWidth()){
+                this.Image = strip.getSubimage(stripx, 0, stripinc,strip.getHeight());
+            }else{
+                this.dispose = true;
+            }
         }
         
     }

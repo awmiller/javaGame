@@ -30,7 +30,12 @@ import java.net.URL;
 import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -54,6 +59,7 @@ public class Game extends JFrame implements Runnable{
     static GraphicsConfiguration config;
     MiniMap miniMap;
     Dimension screenSplitLocation;
+    public static final boolean ENABLE_MUSIC = false;
     
     static{
     GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -154,6 +160,20 @@ public class Game extends JFrame implements Runnable{
 //        ((Game)runner).otherframe.setFocusable(true);
         Thread game = new Thread((Runnable) runner);
         game.start();
+
+        if(ENABLE_MUSIC)
+        try {
+            URL defaultSound = Game.class.getResource("/res/Music.mid");
+            System.out.print("\n"+defaultSound.toString());
+            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
+//            File soundFile = new File(defaultSound.toURI());
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            System.out.print("\n"+e.toString());
+        }
     }
 
     
@@ -231,6 +251,21 @@ public class Game extends JFrame implements Runnable{
             
         }
         
+    }
+    
+    public static void playClip(String path){
+        try {
+            URL defaultSound = Game.class.getResource(path);
+            System.out.print("\n"+defaultSound.toString());
+            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
+//            File soundFile = new File(defaultSound.toURI());
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            System.out.print("\n"+e.toString());
+        }
     }
 
 }

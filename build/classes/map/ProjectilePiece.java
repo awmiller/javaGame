@@ -58,6 +58,11 @@ class ProjectilePiece extends GamePiece {
             ((CharacterPiece)collider).takesDamage(Power);
         }
     }
+
+    @Override
+    public void onDispose() {
+        
+    }
     
     
     

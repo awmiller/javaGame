@@ -57,10 +57,6 @@ class ProjectilePiece extends GamePiece {
         if(collider instanceof CharacterPiece){
             ((CharacterPiece)collider).takesDamage(Power);
         }
-    }
-    
-    
-    
-    
+    }    
     
 }

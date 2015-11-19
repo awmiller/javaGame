@@ -186,7 +186,10 @@ public class Map implements Observer{
         Dimension oldLocation = new Dimension(gamePiece.Location);
         gamePiece.Location = newLocation;
         for(GamePiece other : contents){
-            if(other.isRigid() && (other!=gamePiece)){
+            
+            if(other==gamePiece)continue;
+            
+            if(other.isRigid()){
                 if(other.isColliding(gamePiece)){
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
@@ -198,6 +201,14 @@ public class Map implements Observer{
                         other.onCollide(gamePiece);
                         gamePiece.onCollide(other);
                     }
+                }
+            }else{ //Not Rigid
+                if(other.isColliding(gamePiece) &&
+                        (other instanceof PowerUpPiece)){
+                    
+                        //Apply onCollide() to pickups
+                        other.onCollide(gamePiece);
+                        gamePiece.onCollide(other);
                 }
             }
         }
@@ -378,6 +389,7 @@ public class Map implements Observer{
         for(GamePiece gp : copy){
             if(gp.disposable()){
                 contents.remove(gp);
+                gp.onDispose();
                 if(gp instanceof CharacterPiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
                 else if(gp instanceof ProjectilePiece)

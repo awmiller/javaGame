@@ -76,7 +76,11 @@ public abstract class GamePiece extends Observable{
     }
     
     public void onCollide(GamePiece collider){
-        System.out.print("\n"+this.toString()+"Collided with " +collider.toString());
+        //System.out.print("\n"+this.toString()+"Collided with " +collider.toString());
+    }
+    
+    public void onDispose(){
+        
     }
 
 }
