@@ -42,6 +42,8 @@ public class Map implements Observer{
     
     ArrayList<GamePiece> contents;
     ArrayList<String> ListLines = new ArrayList<>();
+    ArrayList<Dimension> pickupSpawns = new ArrayList<>();
+    ArrayList<Dimension> playerSpawns = new ArrayList<>();
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
     static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
@@ -65,6 +67,13 @@ public class Map implements Observer{
     public GamePiece add(GamePiece go){
         contents.add(go);
         go.addObserver(this);
+        return go;
+    }
+    
+        
+    public GamePiece remove(GamePiece go){
+        contents.remove(go);
+        go.deleteObserver(this);
         return go;
     }
     /**
@@ -173,7 +182,17 @@ public class Map implements Observer{
         
     }
     
+    int FrameCount=0;
     public void moveAll(){
+        FrameCount++;
+        
+        if((FrameCount%(Game.FRAMES_PER_SECOND*10) == 0)
+                &&(pickupSpawns.size()>0)){
+            Dimension rem = pickupSpawns.get(
+                    Math.round((float)Math.random()*(pickupSpawns.size()-1)));
+            pickupSpawns.remove(rem);
+            add(PowerUpPiece.getRandom(rem));
+        }
         ArrayList<GamePiece> copy = new ArrayList<>(contents);
         for(GamePiece gp: copy){
             gp.move();
@@ -337,14 +356,24 @@ public class Map implements Observer{
                                 new Dimension(j, i),PowerUpPiece.POWER_BOUNCE));
                         break;
                     case 'M':
-                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_MISSILE_IMG, 
+                                new Dimension(j, i),PowerUpPiece.POWER_MISSILE));
                         break;
                     case 'S':
-                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_SHIELD_IMG, 
+                                new Dimension(j, i),PowerUpPiece.POWER_SHIELD));
                         break;
                     case 'T':
-                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_TURRET_IMG, 
+                                new Dimension(j, i),PowerUpPiece.POWER_TURRET));
                         break;
+                    case 'R':
+                        pickupSpawns.add(new Dimension(j,i));
+                        break;
+                    case 'P':
+                        playerSpawns.add(new Dimension(j,i));
+                        break;
+                            
                 }
 
                 j += wall1.getWidth();
@@ -388,13 +417,31 @@ public class Map implements Observer{
         
         for(GamePiece gp : copy){
             if(gp.disposable()){
-                contents.remove(gp);
+                
+                remove(gp);
+                
                 gp.onDispose();
+                
                 if(gp instanceof CharacterPiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
                 else if(gp instanceof ProjectilePiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));
+                else if(gp instanceof PowerUpPiece){
+                    pickupSpawns.add(gp.Location);
+                }
             }
         }
+    }
+
+    public void spawnPlayer(GamePiece player) {
+        if(playerSpawns.size()>0){
+            player.Location = playerSpawns.get(
+                    Math.round((float)Math.random()*
+                            (playerSpawns.size()-1)));
+            
+        }else{
+            player.Location = new Dimension(100,100);
+        }
+        add(player);
     }
 }

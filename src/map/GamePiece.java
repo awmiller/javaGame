@@ -23,6 +23,7 @@ public abstract class GamePiece extends Observable{
     protected boolean rigid = false;
     protected boolean hasMoved = false;
     public Dimension NextMove = Game.ZERO_VECTOR;
+    protected int Respawn =0;
     
     protected BufferedImage Image;
     protected Dimension Location;
@@ -81,6 +82,18 @@ public abstract class GamePiece extends Observable{
     
     public void onDispose(){
         
+    }
+
+    public int getRespawn() {
+        if(Respawn > 0){
+            Respawn--;
+            onRespawn();
+        }
+        return Respawn;
+    }
+
+    public void onRespawn() {
+        dispose = false;
     }
 
 }
