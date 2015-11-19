@@ -39,10 +39,15 @@ public class CharacterPiece extends GamePiece {
         return Health;
     }
 
-    private int WeaponPowerDuration = 0;
     protected int Power = 5;
     public int getPower() {
         return Power;
+    }
+    
+    private int WeaponEquipDuration = 0;
+    private AttackEvent equippedWeapon = AttackEvent.BulletAttack;
+    public void equipWeapon(AttackEvent weapon){
+        equippedWeapon = weapon;
     }
 
     protected int Armor;
@@ -128,13 +133,14 @@ public class CharacterPiece extends GamePiece {
             if(AttackBoostDuration<=0){
                 AttackSpeedDivider = 4;
                 AttackBoostDuration=0;
+                equippedWeapon = AttackEvent.BulletAttack;
             }
         }
         
-        if(WeaponPowerDuration > 0){
-            WeaponPowerDuration--;
-            if(WeaponPowerDuration <=0){
-                WeaponPowerDuration=0;
+        if(WeaponEquipDuration > 0){
+            WeaponEquipDuration--;
+            if(WeaponEquipDuration <=0){
+                WeaponEquipDuration=0;
                 Power = 5;
             }
         }
@@ -162,14 +168,14 @@ public class CharacterPiece extends GamePiece {
         
         NextMove = Game.rotate(move, heading);
         
-        if(mControlls.eventQueue.contains(AttackEvent.MissileAttack)){
+        if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
             
 //            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
 //            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
             if(AttackCooldown ==0){
                 AttackCooldown = Game.FRAMES_PER_SECOND/AttackSpeedDivider;
                 setChanged();
-                notifyObservers(AttackEvent.MissileAttack);
+                notifyObservers(equippedWeapon);
                 clearChanged();
                 return;
             }
@@ -185,7 +191,8 @@ public class CharacterPiece extends GamePiece {
             switch(((PowerUpPiece)collider).getType()){
                 case PowerUpPiece.POWER_BOUNCE:
                     this.Power +=5;
-                    this.WeaponPowerDuration = Game.FRAMES_PER_SECOND*10;
+                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
+                    this.equipWeapon(AttackEvent.BouncingAttack);
                     break;
             }
             collider.onCollide(this);

@@ -24,6 +24,9 @@ class ExplosionAnimation extends GamePiece {
     static BufferedImage smallImage = Game.getSprite("/res/Explosion_small.png");
     static BufferedImage largeImage = Game.getSprite("/res/Explosion_large.png");
     
+    private static String SMALL_SOUND = "/res/Explosion_small.wav";
+    private static String LARGE_SOUND = "/res/Explosion_large.wav";
+    
     static{
         small = new Dimension(smallImage.getWidth(),smallImage.getHeight());
         large = new Dimension(largeImage.getWidth(),largeImage.getHeight());
@@ -41,9 +44,11 @@ class ExplosionAnimation extends GamePiece {
          if(type==SMALL){
             exp = smallImage.getSubimage(0, 0, 32, 32);
             explosion = new ExplosionAnimation(exp,location,smallImage);
+            Game.playClip(SMALL_SOUND);
         } else{
             exp = largeImage.getSubimage(0, 0, 64, 64);
             explosion = new ExplosionAnimation(exp,location,largeImage);
+            Game.playClip(LARGE_SOUND);
         }
         
         return explosion;

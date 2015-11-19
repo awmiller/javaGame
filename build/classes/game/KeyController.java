@@ -46,8 +46,8 @@ public class KeyController extends KeyAdapter{
                 if(!eventQueue.contains(MoveEvent.RotateRight))
                     eventQueue.add(MoveEvent.RotateRight);
             } else if(code==FIRE_CHAR){
-                if(!eventQueue.contains(AttackEvent.MissileAttack))
-                    eventQueue.add(AttackEvent.MissileAttack);
+                if(!eventQueue.contains(AttackEvent.PendingAttack))
+                    eventQueue.add(AttackEvent.PendingAttack);
             }
             //mModel.onEvent();
             //System.out.println("KeyPressed!"+ e.getKeyChar());
@@ -71,8 +71,8 @@ public class KeyController extends KeyAdapter{
                 if(eventQueue.contains(MoveEvent.RotateRight))
                     eventQueue.remove(MoveEvent.RotateRight);
             } else if(code==FIRE_CHAR){
-                if(eventQueue.contains(AttackEvent.MissileAttack))
-                    eventQueue.remove(AttackEvent.MissileAttack);
+                if(eventQueue.contains(AttackEvent.PendingAttack))
+                    eventQueue.remove(AttackEvent.PendingAttack);
             }else{
                 mModel.onEvent();  
             }

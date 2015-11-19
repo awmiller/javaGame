@@ -215,7 +215,7 @@ public class Game extends JFrame implements Runnable{
             Graphics2D g2d = img.createGraphics();
             g2d.drawImage(paintable,0,0, null);
             g2d.dispose();
-            System.out.print(url);
+//            System.out.print(url);
         } catch (IOException ex) {
             Logger.getLogger(Tile.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -256,7 +256,7 @@ public class Game extends JFrame implements Runnable{
     public static void playClip(String path){
         try {
             URL defaultSound = Game.class.getResource(path);
-            System.out.print("\n"+defaultSound.toString());
+//            System.out.print("\n"+defaultSound.toString());
             // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
 //            File soundFile = new File(defaultSound.toURI());
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);

@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -21,12 +22,44 @@ class ProjectilePiece extends GamePiece {
     private double Heading;
     private int Power;
     
+    public static final BufferedImage missleImg = Game.getSprite("/res/Rocket.gif");
+    public static final BufferedImage bulletImg = Game.getSprite("/res/Shell.png");
+    public static final BufferedImage bouncerImg = Game.getSprite("/res/Bouncing.gif");
+    
+    protected boolean canRicochet = false;
+    protected int CollisionLife =0;
+
+    
     ProjectilePiece(double heading, int power, Dimension location) {
         super(Game.getSprite("/res/Shell.png"),location);
         Heading = heading - Math.PI;
         Power = power;
     }
 
+        
+    private ProjectilePiece(BufferedImage img, Dimension location) {
+        super(img,location);
+    }
+    
+    public static ProjectilePiece getProjectile(AttackEvent ae, Dimension origin, double heading){
+        ProjectilePiece pp;
+        if(ae == AttackEvent.MissileAttack){
+            pp = new ProjectilePiece(missleImg,origin);
+            pp.Power = 10;
+        }else if(ae==AttackEvent.BouncingAttack){
+            pp = new ProjectilePiece(bouncerImg,origin);  
+            pp.Power = 5;
+            pp.canRicochet = true;
+            pp.CollisionLife = 3;
+        }else {
+            pp = new ProjectilePiece(bulletImg,origin);
+            pp.Power = 5;
+        }
+        
+        pp.Heading = heading - Math.PI;
+        return pp;
+    }
+    
     @Override
     public void move() {
         NextMove = Game.rotate(12, Heading);
@@ -52,10 +85,44 @@ class ProjectilePiece extends GamePiece {
 
     @Override
     public void onCollide(GamePiece collider) {
-        super.onCollide(collider); 
-        super.dispose = true;
+        super.onCollide(collider);
+        
+        if(CollisionLife==0){
+            super.dispose = true;
+        }else{
+            CollisionLife--;
+        }
+            
         if(collider instanceof CharacterPiece){
             ((CharacterPiece)collider).takesDamage(Power);
+        }else if(canRicochet){
+            double h = Math.abs(Heading)%(2*Math.PI);
+            if(h<0) h+=Math.PI*2;
+            
+            System.out.printf("\nHeading %f  ",h);
+            int right = this.Location.width - collider.Location.width;
+            int top = this.Location.height - collider.Location.height;
+            
+            if(Math.abs(right) > Math.abs(top)){
+                if(h<Math.PI/2)
+                    Heading-=Math.PI/2;
+                else if(h<Math.PI)
+                    Heading+=Math.PI/2;
+                else if(h<3*Math.PI/2)
+                    Heading-=Math.PI/2;
+                else
+                    Heading+=Math.PI/2;
+                
+            }else{
+                if(h<Math.PI/2)
+                    Heading+=Math.PI/2;
+                else if(h<Math.PI)
+                    Heading-=Math.PI/2;
+                else if(h<3*Math.PI/2)
+                    Heading+=Math.PI/2;
+                else
+                    Heading-=Math.PI/2;    
+            }
         }
     }    
     

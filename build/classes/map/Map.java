@@ -160,8 +160,8 @@ public class Map implements Observer{
             CharacterPiece cp = (CharacterPiece) o;
 
             if(arg instanceof AttackEvent){
-                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
-                add(pjtl);
+//                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
+                add(ProjectilePiece.getProjectile((AttackEvent) arg,cp.Location,cp.getHeading()));
                 System.out.print("\nProjectile Created!");
             }
         }
