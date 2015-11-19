@@ -9,13 +9,17 @@ import game.AttackEvent;
 import game.Game;
 import game.KeyController;
 import game.MoveEvent;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Observable;
@@ -24,6 +28,9 @@ import java.util.Observable;
 public class CharacterPiece extends GamePiece {
     
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
+    private static int epsillon = 10;
+    public static final BufferedImage weaponStrip = Game.getSprite("/res/Weapon_strip3.png");
+    public static final BufferedImage shieldImg = Game.getSprite("/res/Shield1.png");
     
     int AttackSpeedDivider = 4;
     int AttackBoostDuration = 0;
@@ -55,6 +62,14 @@ public class CharacterPiece extends GamePiece {
         Armor =level;
     }
     
+    private int Score=0;
+    @Override
+    public int addScore(int i) {
+        Score += i;
+        return Score;
+    }
+    public final int getScore(){return Score;}
+    
     private int speed;
     private double heading;
     public final double getHeading(){return heading;}
@@ -66,6 +81,7 @@ public class CharacterPiece extends GamePiece {
             dispose =true;
             this.Respawn = 2*Game.FRAMES_PER_SECOND;
         }
+        if(Armor>0){Armor--;}
         return damage;
     }
     
@@ -92,14 +108,37 @@ public class CharacterPiece extends GamePiece {
         AffineTransformOp atxop = new AffineTransformOp(rotation,AffineTransformOp.TYPE_BILINEAR);
 
         g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
-
+        
         float percent = (float)Health/(float)maxHealth;
         int red = Math.round(255 - (float)Math.pow(255, percent));
         int green = Math.round((float)Math.pow(255, percent));//
         g2d.setColor(new Color(red,green,0,255));
         g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
+        
+        if(equippedWeapon.Subtype==AttackEvent.BOUNCING_ATTACK){
+            g2d.drawImage(
+                    weaponStrip.getSubimage(weaponStrip.getWidth()/3,0, 
+                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
+                    Location.width-size.width/2, 
+                    Location.height+size.height/2 - weaponStrip.getHeight(),
+                    null);
+        }else if(equippedWeapon.Subtype==AttackEvent.MISSILE_ATTACK){
+            g2d.drawImage(
+                    weaponStrip.getSubimage(0,0, 
+                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
+                    Location.width-size.width/2, 
+                    Location.height+size.height/2 - weaponStrip.getHeight(),
+                    null);
+        }
+        if(Armor > 0){
+            g2d.drawImage(shieldImg, 
+                    Location.width-shieldImg.getWidth()/2,
+                    Location.height-shieldImg.getHeight()/2,null);
+        }
+//        Rectangle thisbox = Game.getRectCollider(this.Location, this.size); 
+//        g2d.draw(getCollider());
 //        g2d.draw(new Rectangle(Location.width-size.width/2, Location.height+size.height/2,Health,20));
-//        g2d.drawOval(Location.width-radius(), Location.height-radius(), 2*radius(),2*radius());
+//        g2d.drawOval(Location.width-collideRadius(), Location.height-collideRadius(), 2*collideRadius(),2*collideRadius());
 
     }
     
@@ -197,6 +236,20 @@ public class CharacterPiece extends GamePiece {
                     this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
                     this.equipWeapon(AttackEvent.BouncingAttack);
                     break;
+                case PowerUpPiece.POWER_MISSILE:
+                    this.Power +=10;
+                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
+                    this.equipWeapon(AttackEvent.MissileAttack);
+                    break;
+                case PowerUpPiece.POWER_SHIELD:
+                    this.Armor=10;
+                    break;
+                case PowerUpPiece.POWER_TURRET:
+                    Health+= 10; if(Health>maxHealth) Health = maxHealth;
+                    WeaponEquipDuration=0;
+                    Power = 5;
+                    equippedWeapon = AttackEvent.BulletAttack;
+                    break;
             }
             collider.onCollide(this);
         }
@@ -208,6 +261,32 @@ public class CharacterPiece extends GamePiece {
         super.onRespawn();
         Health = maxHealth;
     }
+    
+    @Override
+    public int collideRadius() {
+        return radius() - epsillon;
+    }    
+//
+//    @Override
+//    public boolean isColliding(GamePiece other) {
+//        return
+//        (getCollider().intersects(other.getCollider().getBounds())) &&
+//        (other.getCollider().intersects(getCollider().getBounds()));
+//    }
+//    
+
+//    @Override
+//    public Shape getCollider() {
+//        Dimension topl = new Dimension(
+//                Location.width - size.width/2 + epsillon,
+//                Location.height - size.height/2 + epsillon);
+//        Dimension sz = new Dimension( 
+//                size.width - 2*epsillon,
+//                size.height - 2*epsillon);
+//        AffineTransform af = new AffineTransform();
+//        af.rotate(heading, Location.width, Location.height);
+//        return af.createTransformedShape(new Rectangle(topl.width,topl.height,sz.width,sz.height));
+//    }
     
     
 

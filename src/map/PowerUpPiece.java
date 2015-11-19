@@ -34,15 +34,15 @@ class PowerUpPiece extends GamePiece {
                         rem,PowerUpPiece.POWER_BOUNCE);
             case POWER_MISSILE:
                 return 
-                    new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
+                    new PowerUpPiece(PowerUpPiece.POWER_MISSILE_IMG, 
                         rem,PowerUpPiece.POWER_MISSILE);
             case POWER_SHIELD:
                 return 
-                    new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
+                    new PowerUpPiece(PowerUpPiece.POWER_SHIELD_IMG, 
                         rem,PowerUpPiece.POWER_SHIELD);
             default:
                 return 
-                    new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
+                    new PowerUpPiece(PowerUpPiece.POWER_TURRET_IMG, 
                         rem,PowerUpPiece.POWER_TURRET);
         }
     }

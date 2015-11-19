@@ -13,6 +13,8 @@ import java.awt.image.ImageObserver;
 import java.util.Observable;
 import java.util.Observer;
 import game.Game;
+import java.awt.Shape;
+import java.awt.geom.Area;
 
 /**
  *
@@ -48,7 +50,7 @@ public abstract class GamePiece extends Observable{
     
     public boolean isColliding(GamePiece other) {
         int distance = Game.distance(this.Location,other.Location);
-        return distance<(this.radius()+other.radius());
+        return distance<(this.collideRadius()+other.collideRadius());
     }
 
     public boolean drawsBefore(GamePiece obj) {
@@ -96,4 +98,16 @@ public abstract class GamePiece extends Observable{
         dispose = false;
     }
 
+    
+    public int addScore(int i){return 0;}
+    
+//    public Shape getCollider(){
+//        Dimension offset = new Dimension(Location.width-size.width/2,
+//                Location.height-size.height/2);
+//        return Game.getRectCollider(offset, size);
+//    }
+
+    public int collideRadius() {
+        return radius();
+    }
 }

@@ -10,9 +10,30 @@ import java.awt.image.BufferedImage;
 
 
 public class ObstaclePiece extends GamePiece {
+    
+    boolean Destructable = false;
+    private int Health = 4;
 
     public ObstaclePiece(BufferedImage image, Dimension location) {
         super(image, location);
         rigid = true;
     }   
+
+    ObstaclePiece(BufferedImage image, Dimension location, boolean b) {
+        super(image, location);
+        rigid = true;
+        Destructable = b;
+    }
+
+    @Override
+    public void onCollide(GamePiece collider) {
+        if((collider instanceof ProjectilePiece)&&Destructable){
+            Health--;
+        }
+        if(Health < 1){
+            dispose = true;
+        }
+    }
+    
+    
 }

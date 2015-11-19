@@ -25,9 +25,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -44,6 +46,7 @@ public class Map implements Observer{
     ArrayList<String> ListLines = new ArrayList<>();
     ArrayList<Dimension> pickupSpawns = new ArrayList<>();
     ArrayList<Dimension> playerSpawns = new ArrayList<>();
+    HashMap<Dimension,Integer> wallSpawns = new HashMap<>();
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
     static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
@@ -186,13 +189,14 @@ public class Map implements Observer{
     public void moveAll(){
         FrameCount++;
         
-        if((FrameCount%(Game.FRAMES_PER_SECOND*10) == 0)
+        if((FrameCount%(Game.FRAMES_PER_SECOND*2) == 0)
                 &&(pickupSpawns.size()>0)){
             Dimension rem = pickupSpawns.get(
                     Math.round((float)Math.random()*(pickupSpawns.size()-1)));
             pickupSpawns.remove(rem);
             add(PowerUpPiece.getRandom(rem));
         }
+        
         ArrayList<GamePiece> copy = new ArrayList<>(contents);
         for(GamePiece gp: copy){
             gp.move();
@@ -347,9 +351,10 @@ public class Map implements Observer{
                 switch (c) {
                     case 'w':
                         contents.add(new ObstaclePiece(wall1, new Dimension(j, i)));
+                        
                         break;
                     case 'W':
-                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i)));
+                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i),true));
                         break;
                     case 'B':
                         contents.add(new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
@@ -429,8 +434,21 @@ public class Map implements Observer{
                 else if(gp instanceof PowerUpPiece){
                     pickupSpawns.add(gp.Location);
                 }
+                else if(gp instanceof ObstaclePiece){
+                    wallSpawns.put(gp.Location, Game.FRAMES_PER_SECOND*20);
+                }
             }
+            
         }
+        ArrayList<Dimension> s = new ArrayList(wallSpawns.keySet());
+                for(Dimension d : s){
+                    int i = wallSpawns.remove(d) -1;
+                    if(i<1){
+                        add(new ObstaclePiece(wall2, d,true));
+                    }else{
+                        wallSpawns.put(d, i);
+                    }
+                }
     }
 
     public void spawnPlayer(GamePiece player) {

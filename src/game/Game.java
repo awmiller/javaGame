@@ -57,7 +57,7 @@ public class Game extends JFrame implements Runnable{
     static GraphicsConfiguration config;
     MiniMap miniMap;
     Dimension screenSplitLocation;
-    public static final boolean ENABLE_MUSIC = true;
+    public static final boolean ENABLE_MUSIC = false;
     
     static{
     GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -186,17 +186,18 @@ public class Game extends JFrame implements Runnable{
 //            camera2.repaint();
             gameView.repaint();
             gameMap.cleanUp();
+            
             if(!gameMap.getObjects().contains(player1)){
                 if(player1.getRespawn() == 0){
                     gameMap.spawnPlayer(player1);
-                    player1Score++;
+                    player1.addScore(1);
                 }
             }
             
             if(!gameMap.getObjects().contains(player2)){
                 if(player2.getRespawn() == 0){
                     gameMap.spawnPlayer(player2);
-                    player2Score++;
+                    player2.addScore(1);
                 }
             }
         try {
@@ -254,11 +255,14 @@ public class Game extends JFrame implements Runnable{
         public GamePanel(Dimension size){
             super();
             setSize(size);
+            setOpaque(true);
+            setBackground(Color.BLACK);
         }
         
         @Override
         public void paint(Graphics g){
             super.paint(g);
+            
             Graphics2D g2d = (Graphics2D)g;
             paintEverthing(g2d);
             
