@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package map;
+package game;
 
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;

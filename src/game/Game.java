@@ -5,10 +5,12 @@
  */
 package game;
 
+import map.MapView;
 import java.awt.BorderLayout;
 import map.Tiles;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -57,7 +59,7 @@ public class Game extends JFrame implements Runnable{
     static GraphicsConfiguration config;
     MiniMap miniMap;
     Dimension screenSplitLocation;
-    public static final boolean ENABLE_MUSIC = false;
+    public static final boolean ENABLE_MUSIC = true;
     
     static{
     GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -69,7 +71,7 @@ public class Game extends JFrame implements Runnable{
     public JPanel otherpanel;
 
     public static Rectangle getRectCollider(Dimension origin, Dimension size) {
-        return new Rectangle(origin.width,origin.height,size.width,size.height);
+        return new Rectangle(origin.width-size.width/2,origin.height-size.height/2,size.width,size.height);
     }
 
     public static int distance(Dimension d1, Dimension d2) {
@@ -122,10 +124,10 @@ public class Game extends JFrame implements Runnable{
         bimg = (BufferedImage) getSprite("/res/tank1_strip60.png");
         player1 = new CharacterPiece(bimg,player1Controller,new Dimension(300,300));
         player2 = new CharacterPiece(bimg,player2Controller,new Dimension(600,600));
-        player1 = gameMap.add(player1);
         
- 
-        player2 = gameMap.add(player2);
+        
+        //player1 = gameMap.add(player1);
+        //player2 = gameMap.add(player2);
         
         //camera is a view into the gameMap
         //currently this should show the whole map
@@ -135,7 +137,7 @@ public class Game extends JFrame implements Runnable{
         
         gameView = new GamePanel(new Dimension(1120,500));
         
-        screenSplitLocation = new Dimension(560,500);
+        screenSplitLocation = new Dimension(560,520);
         
         miniMap = new MiniMap(gameMap,6);
                 
@@ -148,19 +150,14 @@ public class Game extends JFrame implements Runnable{
         setLocationRelativeTo(null);
         addKeyListener(player1Controller);
         addKeyListener(player2Controller);
+        
+        
+        gameMap.spawnPlayer(player1);
+        gameMap.spawnPlayer(player2);
     }
     
     
     public static void main(String args[]) {
-        JFrame runner = new Game(TILES_PER_DIMENSION);
-//        runner.pack();
-        runner.setFocusable(true);
-        runner.setVisible(true); 
-//        ((Game)runner).otherframe.setVisible(true);
-//        ((Game)runner).otherframe.setFocusable(true);
-        Thread game = new Thread((Runnable) runner);
-        game.start();
-
         if(ENABLE_MUSIC)
         try {
             URL defaultSound = Game.class.getResource("/res/Music.mid");
@@ -170,10 +167,20 @@ public class Game extends JFrame implements Runnable{
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
-            clip.start();
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (Exception e) {
             System.out.print("\n"+e.toString());
         }
+        
+        JFrame runner = new Game(TILES_PER_DIMENSION);
+//        runner.pack();
+        runner.setFocusable(true);
+        runner.setVisible(true); 
+//        ((Game)runner).otherframe.setVisible(true);
+//        ((Game)runner).otherframe.setFocusable(true);
+        Thread game = new Thread((Runnable) runner);
+        game.start();
+        
     }
 
     
@@ -266,6 +273,9 @@ public class Game extends JFrame implements Runnable{
             Graphics2D g2d = (Graphics2D)g;
             paintEverthing(g2d);
             
+            g2d.setFont(new Font("TimesRoman", Font.PLAIN, 16));
+            g2d.drawString("|| Player 1 controls: W,A,S,D <SPACE> || Player 2 controls: I,J,K,L, B ||",0,515);
+        
         }
         
     }

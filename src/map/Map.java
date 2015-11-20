@@ -7,7 +7,6 @@ package map;
 
 import game.AttackEvent;
 import game.Game;
-import game.MapView;
 import game.MoveEvent;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -148,7 +147,7 @@ public class Map implements Observer{
     public void moveAll(){
         FrameCount++;
         
-        if((FrameCount%(Game.FRAMES_PER_SECOND*2) == 0)
+        if((FrameCount%(Game.FRAMES_PER_SECOND*8) == 0)
                 &&(pickupSpawns.size()>0)){
             Dimension rem = pickupSpawns.get(
                     Math.round((float)Math.random()*(pickupSpawns.size()-1)));
@@ -239,6 +238,7 @@ public class Map implements Observer{
      * @param location top-left corner specification, relative to this map
      * @param size total pixel dimensions of the window
      * @return the modified graphics object
+     * @deprecated replaced
      */
     synchronized public Graphics2D drawObjects(Graphics2D g2d, Dimension location, Dimension size)  {
         //copy contents so we can modify it            
@@ -467,6 +467,21 @@ public class Map implements Observer{
         }else{
             player.Location = new Dimension(100,100);
         }
+        
+        Dimension save = new Dimension(player.Location);
+        
+        for(GamePiece gp : contents){
+            if(gp instanceof CharacterPiece)
+                if(gp.isColliding(player)){
+                    
+                    playerSpawns.remove(save);
+                    spawnPlayer(player);
+                    playerSpawns.add(save);
+                    return;
+                }
+                    
+        }
+        
         add(player);
     }
 }

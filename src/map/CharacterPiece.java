@@ -20,6 +20,7 @@ import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -29,7 +30,7 @@ import java.util.Observable;
 public class CharacterPiece extends GamePiece {
     
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
-    private static int epsillon = 10;
+    private static int epsillon = 20;
     public static final BufferedImage weaponStrip = Game.getSprite("/res/Weapon_strip3.png");
     public static final BufferedImage shieldImg = Game.getSprite("/res/Shield1.png");
     
@@ -38,9 +39,14 @@ public class CharacterPiece extends GamePiece {
     int SpeedDivider = 4;
     int BoostDuration = 0;
     public void boostSpeed(int duration){
+        if(BoostDuration > 0) 
+        {
+            BoostDuration = duration;
+            return;
+        }
         SpeedDivider = 8;
         speed = 12;
-        equippedWeapon.attackSpeed+=12;
+        equippedWeapon.attackSpeed=20;
         BoostDuration = duration;
     }
     
@@ -85,7 +91,7 @@ public class CharacterPiece extends GamePiece {
             dispose =true;
             this.Respawn = 2*Game.FRAMES_PER_SECOND;
         }
-        if(Armor>0){Armor--;}
+        if(Armor>0){Armor-=damage;}
         return damage;
     }
     
@@ -217,6 +223,9 @@ public class CharacterPiece extends GamePiece {
                 setChanged();
                 notifyObservers(equippedWeapon);
                 clearChanged();
+//                if(equippedWeapon == AttackEvent.SuperBouncingAttack){
+//                    WeaponEquipDuration =2;
+//                }
                 return;
             }
         }
@@ -251,6 +260,11 @@ public class CharacterPiece extends GamePiece {
                 case PowerUpPiece.POWER_FASTFORWARD:
                     this.boostSpeed(Game.FRAMES_PER_SECOND*10);
                     break;
+                case PowerUpPiece.POWER_SUPERBOUNCE:
+                    equippedWeapon = AttackEvent.SuperBouncingAttack;
+                    Power = 30;
+                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
+                    break;
             }
             collider.onCollide(this);
         }
@@ -267,6 +281,8 @@ public class CharacterPiece extends GamePiece {
     public int collideRadius() {
         return radius() - epsillon;
     }    
+    
+    
 //
 //    @Override
 //    public boolean isColliding(GamePiece other) {
@@ -288,6 +304,14 @@ public class CharacterPiece extends GamePiece {
 //        af.rotate(heading, Location.width, Location.height);
 //        return af.createTransformedShape(new Rectangle(topl.width,topl.height,sz.width,sz.height));
 //    }
+
+    @Override
+    boolean isColliding(Rectangle R1) {
+        Shape s = new Ellipse2D.Double(Location.width-size.width/2+epsillon/2,
+                Location.height-size.height/2+epsillon/2,
+                size.width-epsillon,size.height-epsillon);
+        return s.intersects(R1);
+    }
     
     
 

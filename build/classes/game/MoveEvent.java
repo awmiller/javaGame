@@ -7,9 +7,8 @@ package game;
 
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-import map.GameEvent;
-import static map.GameEvent.ATTACK_EVENT;
-import static map.GameEvent.MOVE_THIS_PIECE;
+import static game.GameEvent.ATTACK_EVENT;
+import static game.GameEvent.MOVE_THIS_PIECE;
 
 /**
  *

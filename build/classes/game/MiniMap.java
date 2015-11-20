@@ -34,7 +34,7 @@ class MiniMap {
         int y = viewCenter.height - height;
         
         Graphics2D gmm = img.createGraphics();
-        gmm.drawImage(mMap.printObjectsImage().getScaledInstance(width, height, Image.SCALE_FAST),
+        gmm.drawImage(mMap.printObjectsImage().getScaledInstance(width, height, Image.SCALE_REPLICATE),
                 0,0,null);
         gmm.dispose();
         g2d.drawImage(img, x, y, null);

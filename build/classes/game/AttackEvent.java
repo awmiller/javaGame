@@ -7,8 +7,7 @@ package game;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import map.GameEvent;
-import static map.GameEvent.ATTACK_EVENT;
+import static game.GameEvent.ATTACK_EVENT;
 
 /**
  *
@@ -23,6 +22,7 @@ public final class AttackEvent extends GameEvent {
     public static final String MISSILE_ATTACK = "Attack Event! Type: Missle";
     public static final String BULLET_ATTACK = "Attack Event! Type: Bullet";
     public static final String BOUNCING_ATTACK= "Attack Event! Type: Bouncer";
+    public static final String SUPER_BOUNCING_ATTACK= "Attack Event! Type: Super Bouncer";
 
     public AttackEvent() {
         super();
@@ -38,5 +38,6 @@ public final class AttackEvent extends GameEvent {
     public static final AttackEvent MissileAttack = new AttackEvent(MISSILE_ATTACK);
     public static final AttackEvent BulletAttack = new AttackEvent(BULLET_ATTACK);
     public static final AttackEvent BouncingAttack = new AttackEvent(BOUNCING_ATTACK);
+    public static final AttackEvent SuperBouncingAttack = new AttackEvent(SUPER_BOUNCING_ATTACK);
     public static final AttackEvent PendingAttack = new AttackEvent();
 }

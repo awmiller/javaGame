@@ -5,7 +5,9 @@
  */
 package map;
 
+import game.Game;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 
@@ -24,6 +26,14 @@ public class ObstaclePiece extends GamePiece {
         rigid = true;
         Destructable = b;
     }
+
+    @Override
+    public boolean isColliding(GamePiece other) {
+        Rectangle r1 = Game.getRectCollider(Location, size);
+        return other.isColliding(r1);
+    }
+    
+    
 
     @Override
     public void onCollide(GamePiece collider) {

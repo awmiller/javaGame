@@ -22,9 +22,12 @@ class ProjectilePiece extends GamePiece {
     private double Heading;
     private int Power;
     
+    Dimension lastPlace;
+    
     public static final BufferedImage missleImg = Game.getSprite("/res/Rocket.png");
     public static final BufferedImage bulletImg = Game.getSprite("/res/Shell.png");
     public static final BufferedImage bouncerImg = Game.getSprite("/res/Bouncing.png");
+    public static final BufferedImage SbouncerImg = Game.getSprite("/res/SuperBouncing.png");
     
     protected boolean canRicochet = false;
     protected int CollisionLife =0;
@@ -34,11 +37,16 @@ class ProjectilePiece extends GamePiece {
         super(Game.getSprite("/res/Shell.png"),location);
         Heading = heading - Math.PI;
         Power = power;
+        lastPlace = location;
+        lastHeading = Heading;
     }
 
         
     private ProjectilePiece(BufferedImage img, Dimension location) {
         super(img,location);
+        lastPlace = location;
+        
+        lastHeading = Heading;
     }
     
     public static ProjectilePiece getProjectile(AttackEvent ae, Dimension origin, double heading){
@@ -48,9 +56,14 @@ class ProjectilePiece extends GamePiece {
             pp.Power = 10;
         }else if(ae==AttackEvent.BouncingAttack){
             pp = new ProjectilePiece(bouncerImg,origin);  
-            pp.Power = 5;
+            pp.Power = 10;
             pp.canRicochet = true;
             pp.CollisionLife = 3;
+        }else if(ae==AttackEvent.SuperBouncingAttack){
+            pp = new ProjectilePiece(SbouncerImg,origin);  
+            pp.Power = 30;
+            pp.canRicochet = true;
+            pp.CollisionLife = 10000;
         }else {
             pp = new ProjectilePiece(bulletImg,origin);
             pp.Power = 5;
@@ -66,11 +79,11 @@ class ProjectilePiece extends GamePiece {
     
     @Override
     public void move() {
+//        if(CollisionLife>10) Heading = Math.abs(Heading);
         NextMove = Game.rotate(speed, Heading);
         setChanged();
         notifyObservers(AttackEvent.MissileAttack);
         clearChanged();
-
     }
 
     @Override
@@ -87,9 +100,12 @@ class ProjectilePiece extends GamePiece {
         return true;
     }
 
+    double lastHeading;
     @Override
     public void onCollide(GamePiece collider) {
         super.onCollide(collider);
+        
+        if(collider.rigid == false) return;
         
         if(CollisionLife==0){
             super.dispose = true;
@@ -99,35 +115,49 @@ class ProjectilePiece extends GamePiece {
             
         if(collider instanceof CharacterPiece){
             ((CharacterPiece)collider).takesDamage(Power);
+            super.dispose = true;
         }else if(canRicochet){
             double h = Math.abs(Heading)%(2*Math.PI);
             if(h<0) h+=Math.PI*2;
-            
-//            System.out.printf("\nHeading %f  ",h);
             int right = this.Location.width - collider.Location.width;
             int top = this.Location.height - collider.Location.height;
             
+            
+            System.out.printf("\nHeading %f r %d t %d ",h,right,top);
+            double apply =0;
             if(Math.abs(right) > Math.abs(top)){
                 if(h<Math.PI/2)
-                    Heading-=Math.PI/2;
+                    apply-=Math.PI/8;
                 else if(h<Math.PI)
-                    Heading+=Math.PI/2;
+                    apply+=Math.PI/8;
                 else if(h<3*Math.PI/2)
-                    Heading-=Math.PI/2;
+                    apply-=Math.PI/8;
                 else
-                    Heading+=Math.PI/2;
+                    apply+=Math.PI/8;
                 
             }else{
                 if(h<Math.PI/2)
-                    Heading+=Math.PI/2;
+                    apply+=Math.PI/8;
                 else if(h<Math.PI)
-                    Heading-=Math.PI/2;
+                    apply-=Math.PI/8;
                 else if(h<3*Math.PI/2)
-                    Heading+=Math.PI/2;
+                    apply+=Math.PI/8;
                 else
-                    Heading-=Math.PI/2;    
+                    apply-=Math.PI/8;    
+            }
+            
+            Heading+=apply;
+            NextMove = Game.rotate(speed, Heading);
+            this.Location = Game.add(Location, NextMove);
+            Dimension save = Location;
+            while(collider.isColliding(this) || this.isColliding(collider)){
+                this.Location = save;
+                Heading+=apply;
+                NextMove = Game.rotate(speed, Heading);
+                this.Location = Game.add(Location, NextMove);
             }
         }
+        
     }    
     
 }
