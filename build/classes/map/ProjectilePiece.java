@@ -123,7 +123,7 @@ class ProjectilePiece extends GamePiece {
             int top = this.Location.height - collider.Location.height;
             
             
-            System.out.printf("\nHeading %f r %d t %d ",h,right,top);
+//            System.out.printf("\nHeading %f r %d t %d ",h,right,top);
             double apply =0;
             if(Math.abs(right) > Math.abs(top)){
                 if(h<Math.PI/2)

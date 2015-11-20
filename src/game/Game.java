@@ -143,7 +143,7 @@ public class Game extends JFrame implements Runnable{
                 
         add(gameView);
         
-        setSize(new Dimension(1120,560));
+        setSize(new Dimension(1120,580));
 
         setTitle("Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -273,8 +273,8 @@ public class Game extends JFrame implements Runnable{
             Graphics2D g2d = (Graphics2D)g;
             paintEverthing(g2d);
             
-            g2d.setFont(new Font("TimesRoman", Font.PLAIN, 16));
-            g2d.drawString("|| Player 1 controls: W,A,S,D <SPACE> || Player 2 controls: I,J,K,L, B ||",0,515);
+            g2d.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+            g2d.drawString("|| Player 1 controls: W,A,S,D <SPACE> || Player 2 controls: I,J,K,L, B ||",0,512);
         
         }
         
