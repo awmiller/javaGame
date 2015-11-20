@@ -139,11 +139,6 @@ public class CharacterPiece extends GamePiece {
                     Location.width-shieldImg.getWidth()/2,
                     Location.height-shieldImg.getHeight()/2,null);
         }
-//        Rectangle thisbox = Game.getRectCollider(this.Location, this.size); 
-//        g2d.draw(getCollider());
-//        g2d.draw(new Rectangle(Location.width-size.width/2, Location.height+size.height/2,Health,20));
-//        g2d.drawOval(Location.width-collideRadius(), Location.height-collideRadius(), 2*collideRadius(),2*collideRadius());
-
     }
     
     
@@ -180,7 +175,7 @@ public class CharacterPiece extends GamePiece {
                 SpeedDivider = 4;
                 BoostDuration=0;
                 speed = 6;
-                equippedWeapon.attackSpeed-=12;
+                equippedWeapon.attackSpeed=0;
             }
         }
         
@@ -217,9 +212,6 @@ public class CharacterPiece extends GamePiece {
         NextMove = Game.rotate(move, heading);
         
         if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
-            
-//            System.out.printf("\nATTACK COOLDOWN %d :: Frame %d", AttackCooldown,FrameCount);
-//            mControlls.eventQueue.remove(AttackEvent.MissileAttack);
             if(AttackCooldown ==0){
                 AttackCooldown = Game.FRAMES_PER_SECOND/SpeedDivider;
                 setChanged();

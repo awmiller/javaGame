@@ -22,9 +22,9 @@ class ProjectilePiece extends GamePiece {
     private double Heading;
     private int Power;
     
-    public static final BufferedImage missleImg = Game.getSprite("/res/Rocket.gif");
+    public static final BufferedImage missleImg = Game.getSprite("/res/Rocket.png");
     public static final BufferedImage bulletImg = Game.getSprite("/res/Shell.png");
-    public static final BufferedImage bouncerImg = Game.getSprite("/res/Bouncing.gif");
+    public static final BufferedImage bouncerImg = Game.getSprite("/res/Bouncing.png");
     
     protected boolean canRicochet = false;
     protected int CollisionLife =0;

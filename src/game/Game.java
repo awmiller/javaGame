@@ -133,15 +133,15 @@ public class Game extends JFrame implements Runnable{
         
         camera2 = new MapView(gameMap,new Dimension(500,500),player2);
         
-        gameView = new GamePanel(new Dimension(1000,500));
+        gameView = new GamePanel(new Dimension(1120,500));
         
-        screenSplitLocation = new Dimension(500,500);
+        screenSplitLocation = new Dimension(560,500);
         
-        miniMap = new MiniMap(gameMap,10);
+        miniMap = new MiniMap(gameMap,6);
                 
         add(gameView);
         
-        setSize(new Dimension(1035,540));
+        setSize(new Dimension(1120,560));
 
         setTitle("Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -212,7 +212,7 @@ public class Game extends JFrame implements Runnable{
       }
     }
     
-    Dimension offset = new Dimension(520,0);
+    Dimension offset = new Dimension(620,0);
     public void paintEverthing(Graphics2D g2d){
         camera1.drawView(g2d,new Dimension(0,0));
         camera2.drawView(g2d,offset);

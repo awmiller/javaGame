@@ -5,12 +5,14 @@
         <group>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/map/PowerUpPiece.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/game/AttackEvent.java</file>
+            <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/game/MiniMap.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/map/CharacterPiece.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/game/MapView.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/game/KeyController.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/map/GamePiece.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/map/ProjectilePiece.java</file>
             <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/game/Game.java</file>
+            <file>file:/C:/Users/awmil_000/Documents/NetBeansProjects/Games/src/map/Map.java</file>
         </group>
     </open-files>
 </project-private>

@@ -67,7 +67,6 @@ public class Map implements Observer{
         g2.dispose();
     }
     
-    private final BufferedReader source;
     
     public GamePiece add(GamePiece go){
         contents.add(go);
@@ -124,53 +123,6 @@ public class Map implements Observer{
         return g;
     }
     
-    public Map(String sourceFile) throws Exception{
-        Dimension d;
-        InputStream is = getClass().getResourceAsStream(sourceFile);
-        InputStreamReader isr = new InputStreamReader(is);
-//        BufferedReader br = new BufferedReader(isr);
-//        File f = new File(Game.class.getResource(sourceFile));
-        source = new BufferedReader(isr);
-        readMapSource(source);
-        
-        d = new Dimension(ListLines.get(0).length(),ListLines.size());
-        
-        /**
-         * Initialize data structures
-         */
-        contents = new ArrayList<>();
-        corner = new Dimension(d.width*wall1.getWidth(),d.height*wall1.getHeight());
-        printout = Game.getCompatImage(printout, corner.width,corner.height);
-        /**
-         * Create the backdrop tiles
-         */
-        ArrayList<Tile> tiles;
-        tiles = new ArrayList();
-        /**
-         * add tiles to static image
-         */
-        int area = d.height*d.width;
-        for(int i = 0; i < area;i++){
-            tiles.add(Tiles.getRandom());
-        }   
-        
-        /**
-         * Setup backdrop image
-         */
-        background = Game.getCompatImage(background,corner.width,corner.height);
-        Graphics2D gimg = background.createGraphics();
-        drawBackground(gimg, tiles);
-        //metrics
-        System.out.printf("\nMap Size: %d,%d", corner.height, corner.width);
-        System.out.printf("\nMap Image Size: %d,%d", background.getHeight(),background.getWidth());
-        
-        /**
-         * Create all the walls
-         */
-        createWalls();
-        source.close();
-    }
-
     @Override
     public void update(Observable o, Object arg) { 
         
@@ -342,6 +294,54 @@ public class Map implements Observer{
          */
         obj.draw(g2d);
 
+    }
+    
+    
+    private final BufferedReader source;
+    public Map(String sourceFile) throws Exception{
+        Dimension d;
+        InputStream is = getClass().getResourceAsStream(sourceFile);
+        InputStreamReader isr = new InputStreamReader(is);
+        
+        source = new BufferedReader(isr);
+        readMapSource(source);
+        
+        d = new Dimension(ListLines.get(0).length(),ListLines.size());
+        
+        /**
+         * Initialize data structures
+         */
+        contents = new ArrayList<>();
+        corner = new Dimension(d.width*wall1.getWidth(),d.height*wall1.getHeight());
+        printout = Game.getCompatImage(printout, corner.width,corner.height);
+        /**
+         * Create the backdrop tiles
+         */
+        ArrayList<Tile> tiles;
+        tiles = new ArrayList();
+        /**
+         * add tiles to static image
+         */
+        int area = d.height*d.width;
+        for(int i = 0; i < area;i++){
+            tiles.add(Tiles.getRandom());
+        }   
+        
+        /**
+         * Setup backdrop image
+         */
+        background = Game.getCompatImage(background,corner.width,corner.height);
+        Graphics2D gimg = background.createGraphics();
+        drawBackground(gimg, tiles);
+        //metrics
+        System.out.printf("\nMap Size: %d,%d", corner.height, corner.width);
+        System.out.printf("\nMap Image Size: %d,%d", background.getHeight(),background.getWidth());
+        
+        /**
+         * Create all the walls
+         */
+        createWalls();
+        source.close();
     }
 
     private void createWalls() {
