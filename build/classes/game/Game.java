@@ -94,9 +94,9 @@ public class Game extends JFrame implements Runnable{
     MapView camera1;
     static final int TILES_PER_DIMENSION = 10;
     static final Dimension SCREENSIZE = new Dimension(6,6);
-    static final char[] controls1 = {'w','a','s','d',' '};
+    public static final char[] controls1 = {'w','a','s','d',' '};
     static final char[] controls2 = {'i','j','k','l','b'};
-            KeyController player1Controller = new KeyController(controls1);
+    public KeyController player1Controller = new KeyController(controls1);
         GamePiece player1;
         
            KeyController player2Controller = new KeyController(controls2);
@@ -256,6 +256,15 @@ public class Game extends JFrame implements Runnable{
         img = config.createCompatibleImage(wd, ht, Transparency.TRANSLUCENT);
         img.setAccelerationPriority(1);
         return img;
+    }
+    
+    public static BufferedImage getCompatSprite(String path){
+        BufferedImage bmg = Game.getSprite(path);
+        BufferedImage cmg = Game.getCompatImage(bmg, bmg.getWidth(), bmg.getHeight());
+        Graphics2D g2d = cmg.createGraphics();
+        g2d.drawImage(bmg, 0, 0, null);
+        g2d.dispose();
+        return cmg;
     }
     
     private class GamePanel extends JPanel{

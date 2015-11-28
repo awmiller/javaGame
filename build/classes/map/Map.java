@@ -41,7 +41,7 @@ import javax.swing.JComponent;
  * @author awmil_000
  */
 public class Map implements Observer{
-    private boolean hasMoved;
+    private boolean hasMoved = true;
     
     ArrayList<GamePiece> contents;
     ArrayList<String> ListLines = new ArrayList<>();
@@ -51,18 +51,21 @@ public class Map implements Observer{
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
     static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
-    
+    private static final Dimension wallDimension = new Dimension(40,40);
     static{
-        int wd = wall1.getWidth();
-        int ht = wall1.getHeight();
+        int wd = wallDimension.width;
+        int ht = wallDimension.height;
+        BufferedImage wallStrip = Game.getCompatSprite("/res/kbr8/Wall_tiles.png");
         wall1 = Game.getCompatImage(wall1, wd,ht);
         wall2 = Game.getCompatImage(wall2, wd,ht);
         Graphics2D g1 = wall1.createGraphics();
-        g1.drawImage((BufferedImage) Game.getSprite("/res/Wall1.gif"), 0,0, null);
+        g1.drawImage(wallStrip.getSubimage(0, 0, wd, ht),
+                0,0, null);
         g1.dispose();
         
         Graphics2D g2 = wall2.createGraphics();
-        g2.drawImage((BufferedImage) Game.getSprite("/res/Wall2.gif"), 0,0, null);
+        g2.drawImage(wallStrip.getSubimage(wd, ht, wd, ht),
+                0,0, null);
         g2.dispose();
     }
     
@@ -312,27 +315,33 @@ public class Map implements Observer{
          * Initialize data structures
          */
         contents = new ArrayList<>();
-        corner = new Dimension(d.width*wall1.getWidth(),d.height*wall1.getHeight());
-        printout = Game.getCompatImage(printout, corner.width,corner.height);
         /**
-         * Create the backdrop tiles
+         * initialize background and dimensions
          */
-        ArrayList<Tile> tiles;
-        tiles = new ArrayList();
-        /**
-         * add tiles to static image
-         */
-        int area = d.height*d.width;
-        for(int i = 0; i < area;i++){
-            tiles.add(Tiles.getRandom());
-        }   
-        
+        BufferedImage bg = Game.getSprite("/res/kbr8/Background.bmp");
+        corner = new Dimension(bg.getWidth(),bg.getHeight());
         /**
          * Setup backdrop image
          */
         background = Game.getCompatImage(background,corner.width,corner.height);
         Graphics2D gimg = background.createGraphics();
-        drawBackground(gimg, tiles);
+        gimg.drawImage(bg,0,0,null);
+        gimg.dispose();
+        printout = Game.getCompatImage(printout, corner.width,corner.height);
+        /**
+         * Create the backdrop tiles
+         */
+//        ArrayList<Tile> tiles;
+//        tiles = new ArrayList();
+        /**
+         * add tiles to static image
+         */
+//        int area = d.height*d.width;
+//        for(int i = 0; i < area;i++){
+//            tiles.add(Tiles.getRandom());
+//        }   
+//        
+        
         //metrics
         System.out.printf("\nMap Size: %d,%d", corner.height, corner.width);
         System.out.printf("\nMap Image Size: %d,%d", background.getHeight(),background.getWidth());
@@ -348,10 +357,10 @@ public class Map implements Observer{
 
         int fileProgress = 0;
 
-        for (int i = 0; (i < corner.height) && (fileProgress < ListLines.size());) {
+        for (int i = wall1.getHeight()/2; (i < corner.height) && (fileProgress < ListLines.size());) {
             String line = ListLines.get(fileProgress);
             int lineProgress = 0;
-            for (int j = 0; (j < corner.width) && (lineProgress < line.length());) {
+            for (int j = wall1.getWidth()/2; (j < corner.width) && (lineProgress < line.length());) {
 
                 char c = line.charAt(lineProgress);
                 lineProgress += 1;
@@ -399,7 +408,7 @@ public class Map implements Observer{
     
     private Color transparent = new Color(255, 255, 255, 0);
     
-    public final BufferedImage printObjectsImage(){
+    public final BufferedImage printGameState(){
 //        printout = Game.getCompatImage(printout, corner.width, corner.height);
         if(hasMoved){
             Graphics2D g2d = printout.createGraphics();

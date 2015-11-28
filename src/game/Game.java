@@ -258,6 +258,15 @@ public class Game extends JFrame implements Runnable{
         return img;
     }
     
+    public static BufferedImage getCompatSprite(String path){
+        BufferedImage bmg = Game.getSprite(path);
+        BufferedImage cmg = Game.getCompatImage(bmg, bmg.getWidth(), bmg.getHeight());
+        Graphics2D g2d = cmg.createGraphics();
+        g2d.drawImage(bmg, 0, 0, null);
+        g2d.dispose();
+        return cmg;
+    }
+    
     private class GamePanel extends JPanel{
         public GamePanel(Dimension size){
             super();

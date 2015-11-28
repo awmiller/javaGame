@@ -41,7 +41,7 @@ import javax.swing.JComponent;
  * @author awmil_000
  */
 public class Map implements Observer{
-    private boolean hasMoved;
+    private boolean hasMoved = true;
     
     ArrayList<GamePiece> contents;
     ArrayList<String> ListLines = new ArrayList<>();
@@ -51,19 +51,44 @@ public class Map implements Observer{
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
     static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
+    static BufferedImage BotCenterWall;     // ','
+    static BufferedImage LeftCenterWall;    // ']'
+    static BufferedImage TopCenterWall;     // '''
+    static BufferedImage RightCenterWall;   // '['
+    static BufferedImage TopRightWall;      // 'L'
+    static BufferedImage BotRightWall;      // '<'
+    static BufferedImage BotLeftWall;       // '>'
+    static BufferedImage TopLeftWall;       // 'J'
+    static BufferedImage InvTWall;          // 'w'
+    static BufferedImage RightTWall;        // '}'
+    static BufferedImage TWall;             // 'T'
+    static BufferedImage LeftTWall;         // '{'
+    static BufferedImage CenterWall;        // 'o'
+    static BufferedImage allDirWall;        // '+'
+    static BufferedImage TopBotWall;        // '|'
+    static BufferedImage leftRightWall;     // '='
     
+    private static final Dimension wallDimension = new Dimension(40,40);
     static{
-        int wd = wall1.getWidth();
-        int ht = wall1.getHeight();
-        wall1 = Game.getCompatImage(wall1, wd,ht);
-        wall2 = Game.getCompatImage(wall2, wd,ht);
-        Graphics2D g1 = wall1.createGraphics();
-        g1.drawImage((BufferedImage) Game.getSprite("/res/Wall1.gif"), 0,0, null);
-        g1.dispose();
-        
-        Graphics2D g2 = wall2.createGraphics();
-        g2.drawImage((BufferedImage) Game.getSprite("/res/Wall2.gif"), 0,0, null);
-        g2.dispose();
+        int wd = wallDimension.width;
+        int ht = wallDimension.height;
+        BufferedImage wallStrip = Game.getCompatSprite("/res/kbr8/Wall_tiles.png");
+        BotCenterWall   = wallStrip.getSubimage(0, 0, wd, ht);
+        LeftCenterWall  = wallStrip.getSubimage(1*wd, 0, wd, ht);
+        TopCenterWall   = wallStrip.getSubimage(2*wd, 0, wd, ht);
+        RightCenterWall = wallStrip.getSubimage(3*wd, 0, wd, ht);
+        TopRightWall    = wallStrip.getSubimage(0*wd, 1*ht, wd, ht);
+        BotRightWall    = wallStrip.getSubimage(1*wd, 1*ht, wd, ht);
+        BotLeftWall     = wallStrip.getSubimage(2*wd, 1*ht, wd, ht);
+        TopLeftWall     = wallStrip.getSubimage(3*wd, 1*ht, wd, ht);
+        InvTWall        = wallStrip.getSubimage(0*wd, 2*ht, wd, ht);
+        RightTWall      = wallStrip.getSubimage(1*wd, 2*ht, wd, ht);
+        TWall           = wallStrip.getSubimage(2*wd, 2*ht, wd, ht);
+        LeftTWall       = wallStrip.getSubimage(3*wd, 2*ht, wd, ht);
+        CenterWall      = wallStrip.getSubimage(0*wd, 3*ht, wd, ht);
+        allDirWall      = wallStrip.getSubimage(1*wd, 3*ht, wd, ht);
+        TopBotWall      = wallStrip.getSubimage(2*wd, 3*ht, wd, ht);
+        leftRightWall   = wallStrip.getSubimage(3*wd, 3*ht, wd, ht);
     }
     
     
@@ -354,49 +379,87 @@ public class Map implements Observer{
 
         int fileProgress = 0;
 
-        for (int i = 0; (i < corner.height) && (fileProgress < ListLines.size());) {
+        for (int i = wallDimension.height/2; (i < corner.height) && (fileProgress < ListLines.size());) {
             String line = ListLines.get(fileProgress);
             int lineProgress = 0;
-            for (int j = 0; (j < corner.width) && (lineProgress < line.length());) {
+            for (int j = wallDimension.width/2; (j < corner.width) && (lineProgress < line.length());) {
 
                 char c = line.charAt(lineProgress);
                 lineProgress += 1;
                 switch (c) {
-                    case 'w':
-                        contents.add(new ObstaclePiece(wall1, new Dimension(j, i)));
-                        
-                        break;
-                    case 'W':
-                        contents.add(new ObstaclePiece(wall2, new Dimension(j, i),true));
-                        break;
-                    case 'B':
-                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_BOUNCE_IMG, 
-                                new Dimension(j, i),PowerUpPiece.POWER_BOUNCE));
-                        break;
-                    case 'M':
-                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_MISSILE_IMG, 
-                                new Dimension(j, i),PowerUpPiece.POWER_MISSILE));
-                        break;
-                    case 'S':
-                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_SHIELD_IMG, 
-                                new Dimension(j, i),PowerUpPiece.POWER_SHIELD));
-                        break;
-                    case 'T':
-                        contents.add(new PowerUpPiece(PowerUpPiece.POWER_TURRET_IMG, 
-                                new Dimension(j, i),PowerUpPiece.POWER_TURRET));
-                        break;
-                    case 'R':
-                        pickupSpawns.add(new Dimension(j,i));
-                        break;
                     case 'P':
                         playerSpawns.add(new Dimension(j,i));
+                        break;
+//      BotCenterWall;     // 
+                    case ',':
+                        contents.add(new ObstaclePiece(BotCenterWall,new Dimension(j,i)));
+                        break;
+//      LeftCenterWall;    // 
+                    case ']':
+                        contents.add(new ObstaclePiece(LeftCenterWall,new Dimension(j,i)));
+                        break;
+//      TopCenterWall;     // 
+                    case '\'':
+                        contents.add(new ObstaclePiece(TopCenterWall,new Dimension(j,i)));
+                        break;
+//      RightCenterWall;   // 
+                    case '[':
+                        contents.add(new ObstaclePiece(RightCenterWall,new Dimension(j,i)));
+                        break;
+//      TopRightWall;      // 
+                    case 'L':
+                        contents.add(new ObstaclePiece(TopRightWall,new Dimension(j,i)));
+                        break;
+//      BotRightWall;      // 
+                    case '<':
+                        contents.add(new ObstaclePiece(BotRightWall,new Dimension(j,i)));
+                        break;
+//      BotLeftWall;       // 
+                    case '>':
+                        contents.add(new ObstaclePiece(BotLeftWall,new Dimension(j,i)));
+                        break;
+//      TopLeftWall;       // 
+                    case 'J':
+                        contents.add(new ObstaclePiece(TopLeftWall,new Dimension(j,i)));
+                        break;
+//      InvTWall;          // 
+                    case 'w':
+                        contents.add(new ObstaclePiece(InvTWall,new Dimension(j,i)));
+                        break;
+//      RightTWall;        // 
+                    case '}':
+                        contents.add(new ObstaclePiece(RightTWall,new Dimension(j,i)));
+                        break;
+//      TWall;             // 
+                    case 'T':
+                        contents.add(new ObstaclePiece(TWall,new Dimension(j,i)));
+                        break;
+//      LeftTWall;         // 
+                    case '{':
+                        contents.add(new ObstaclePiece(LeftTWall,new Dimension(j,i)));
+                        break;
+//      CenterWall;        // 
+                    case 'o':
+                        contents.add(new ObstaclePiece(CenterWall,new Dimension(j,i)));
+                        break;
+//      allDirWall;        // 
+                    case '+':
+                        contents.add(new ObstaclePiece(allDirWall,new Dimension(j,i)));
+                        break;
+//      TopBotWall;        // 
+                    case '|':
+                        contents.add(new ObstaclePiece(TopBotWall,new Dimension(j,i)));
+                        break;
+//      leftRightWall;     // 
+                    case '=':
+                        contents.add(new ObstaclePiece(leftRightWall,new Dimension(j,i)));
                         break;
                             
                 }
 
-                j += wall1.getWidth();
+                j += wallDimension.width;
             }
-            i += wall1.getHeight();
+            i += wallDimension.height;
             fileProgress += 1;
         }
     }
@@ -405,7 +468,7 @@ public class Map implements Observer{
     
     private Color transparent = new Color(255, 255, 255, 0);
     
-    public final BufferedImage printObjectsImage(){
+    public final BufferedImage printGameState(){
 //        printout = Game.getCompatImage(printout, corner.width, corner.height);
         if(hasMoved){
             Graphics2D g2d = printout.createGraphics();

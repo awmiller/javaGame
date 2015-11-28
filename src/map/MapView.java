@@ -55,7 +55,7 @@ public class MapView extends JPanel {
         g2d.drawImage(scale,0,0,null);  
         
          BufferedImage scale2 = 
-                map.printObjectsImage().getSubimage(
+                map.printGameState().getSubimage(
                         ScreenClip.width, 
                         ScreenClip.height, 
                         dimens.width,dimens.height);
@@ -76,7 +76,7 @@ public class MapView extends JPanel {
         Dimension ScreenClip = getRelativeScreenLocation();
         
          BufferedImage scale2 = 
-                map.printObjectsImage().getSubimage(
+                map.printGameState().getSubimage(
                         ScreenClip.width, 
                         ScreenClip.height, 
                         dimens.width,dimens.height);
