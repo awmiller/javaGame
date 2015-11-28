@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import map.CharacterPiece;
 import map.GamePiece;
 import map.Map;
 
@@ -23,14 +24,17 @@ import map.Map;
  */
 public class Koalabr8 implements Runnable{
     public static char[] controls = {'w','a','s','d',' '};
-    public KeyController player1Controller = new KeyController(controls);
+    public KeyController playerController = new KeyController(controls);
     
     private ArrayList<GamePiece> Koalas;
     private Map gameMap;
     
+    private static BufferedImage KoalaImg = Game.getCompatSprite("/res/kbr8/Koala_stand.gif");
     private static BufferedImage KoalaDead = Game.getSprite("/res/kbr8/Koala_dead.png");
     
     private int Score = 3;
+    private int NUMBER_OF_KOALAS =3;
+    private long FRAME_PERIOD_MILLIS = 40;
     
     public Koalabr8(){
         URL url = Game.class.getResource("/res/Koala1.map");
@@ -40,6 +44,10 @@ public class Koalabr8 implements Runnable{
             
         }
         gameView = new GameView();
+        
+        for(int i =0; i<=NUMBER_OF_KOALAS; i++){
+            gameMap.spawnPlayer(new CharacterPiece(KoalaImg,playerController,new Dimension(0,0)));
+        }
         
     }
     
@@ -59,12 +67,30 @@ public class Koalabr8 implements Runnable{
         
         mainFrame.setFocusable(true);
         mainFrame.setVisible(true); 
+        
+        Thread t = new Thread(game);
+        t.start();
                 
     }
 
+    int framePeriod = 0;
     @Override
     public void run() {
-        
+        while(true){     
+            long ping = System.currentTimeMillis();
+            gameMap.moveAll();
+            gameView.repaint();
+            gameMap.cleanUp();
+        try {
+            Thread.sleep((long) framePeriod);
+            ping = System.currentTimeMillis() - ping;
+            framePeriod += (FRAME_PERIOD_MILLIS - ping);
+            framePeriod = framePeriod > 0 ? framePeriod : 0;
+//            System.out.printf("Frame Rate: %f\n", (float)(1000/((float)framePeriod)));
+        } catch (InterruptedException ex) {
+            System.out.print(ex);
+        }
+      }
     }
     
     public GameView gameView;
@@ -83,8 +109,12 @@ public class Koalabr8 implements Runnable{
         @Override
         public void paint(Graphics g) {
             super.paint(g);
-            g.drawImage(gameMap.printGameState(),0,banner.getHeight(),null);
-            g.drawImage(banner,0,0,null);
+            for(int i = 0; i<Score;i++){
+                g.drawImage(KoalaDead, banner.getWidth()+(i*KoalaDead.getWidth()),
+                        0, null);
+            }
+            g.drawImage(gameMap.printGameState(),0,banner.getHeight()+10,null);
+            g.drawImage(banner,5,0,null);
         }
         
     }
