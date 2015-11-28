@@ -94,9 +94,9 @@ public class Game extends JFrame implements Runnable{
     MapView camera1;
     static final int TILES_PER_DIMENSION = 10;
     static final Dimension SCREENSIZE = new Dimension(6,6);
-    static final char[] controls1 = {'w','a','s','d',' '};
+    public static final char[] controls1 = {'w','a','s','d',' '};
     static final char[] controls2 = {'i','j','k','l','b'};
-            KeyController player1Controller = new KeyController(controls1);
+    public KeyController player1Controller = new KeyController(controls1);
         GamePiece player1;
         
            KeyController player2Controller = new KeyController(controls2);
