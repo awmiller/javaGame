@@ -47,6 +47,7 @@ public class Map implements Observer{
     ArrayList<String> ListLines = new ArrayList<>();
     ArrayList<Dimension> pickupSpawns = new ArrayList<>();
     ArrayList<Dimension> playerSpawns = new ArrayList<>();
+    ArrayList<ExitPiece> Exits = new ArrayList<>();
     HashMap<Dimension,Integer> wallSpawns = new HashMap<>();
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
@@ -68,7 +69,7 @@ public class Map implements Observer{
     static BufferedImage TopBotWall;        // '|'
     static BufferedImage leftRightWall;     // '='
     
-    private static final Dimension wallDimension = new Dimension(40,40);
+    public static final Dimension wallDimension = new Dimension(40,40);
     static{
         int wd = wallDimension.width;
         int ht = wallDimension.height;
@@ -150,20 +151,20 @@ public class Map implements Observer{
     @Override
     public void update(Observable o, Object arg) { 
         
-        if(o instanceof CharacterPiece){
-        
-            CharacterPiece cp = (CharacterPiece) o;
-
-            if(arg instanceof AttackEvent){
-//                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
-                add(ProjectilePiece.getProjectile((AttackEvent) arg,cp.Location,cp.getHeading()));
-//                System.out.print("\nProjectile Created!");
-            }
-        }
+//        if(o instanceof CharacterPiece){
+//        
+//            CharacterPiece cp = (CharacterPiece) o;
+//
+//            if(arg instanceof AttackEvent){
+////                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
+//                add(ProjectilePiece.getProjectile((AttackEvent) arg,cp.Location,cp.getHeading()));
+////                System.out.print("\nProjectile Created!");
+//            }
+//        }
         
         if(o instanceof GamePiece){
             GamePiece gp = (GamePiece)o;
-            movePieceIfAble(gp,new MoveEvent(gp.NextMove));
+            movePieceIfAble(gp,new MoveEvent(gp.getMove()));
         }
         
     }
@@ -172,13 +173,13 @@ public class Map implements Observer{
     public void moveAll(){
         FrameCount++;
         
-        if((FrameCount%(Game.FRAMES_PER_SECOND*8) == 0)
-                &&(pickupSpawns.size()>0)){
-            Dimension rem = pickupSpawns.get(
-                    Math.round((float)Math.random()*(pickupSpawns.size()-1)));
-            pickupSpawns.remove(rem);
-            add(PowerUpPiece.getRandom(rem));
-        }
+//        if((FrameCount%(Game.FRAMES_PER_SECOND*8) == 0)
+//                &&(pickupSpawns.size()>0)){
+//            Dimension rem = pickupSpawns.get(
+//                    Math.round((float)Math.random()*(pickupSpawns.size()-1)));
+//            pickupSpawns.remove(rem);
+//            add(PowerUpPiece.getRandom(rem));
+//        }
         
         ArrayList<GamePiece> copy = new ArrayList<>(contents);
         for(GamePiece gp: copy){
@@ -390,6 +391,13 @@ public class Map implements Observer{
                     case 'P':
                         playerSpawns.add(new Dimension(j,i));
                         break;
+                        
+                    case 't':
+                        contents.add(new TnTPiece(new Dimension(j,i)));
+                        break;
+                    case 'e':
+                        contents.add(new ExitPiece(new Dimension(j,i)));
+                        break;
 //      BotCenterWall;     // 
                     case ',':
                         contents.add(new ObstaclePiece(BotCenterWall,new Dimension(j,i)));
@@ -527,30 +535,41 @@ public class Map implements Observer{
                 }
     }
 
-    public void spawnPlayer(GamePiece player) {
+    /**
+     * Adds a Character to the map if there are any open spawn points
+     * 
+     * @param player a game piece
+     * @return  true if piece was added
+     */
+    public boolean spawnPlayer(GamePiece player) {
+     
+//Used for tank game:
+        
         if(playerSpawns.size()>0){
-            player.Location = playerSpawns.get(
-                    Math.round((float)Math.random()*
-                            (playerSpawns.size()-1)));
+            int loc = Math.round((float)Math.random()*
+                            (playerSpawns.size()-1));
+            player.Location = playerSpawns.get(loc);
+            playerSpawns.remove(loc);
+            add(player);
+            player.onRespawn();
+            return true;
             
-        }else{
-            player.Location = new Dimension(100,100);
-        }
+        }else { return false; }
+//        
+//        Dimension save = new Dimension(player.Location);
+//        
+//        for(GamePiece gp : contents){
+//            if(gp instanceof CharacterPiece)
+//                if(gp.isColliding(player)){
+//                    
+//                    playerSpawns.remove(save);
+//                    spawnPlayer(player);
+//                    playerSpawns.add(save);
+//                    return;
+//                }
+//                    
+//        }
+//                add(player);
         
-        Dimension save = new Dimension(player.Location);
-        
-        for(GamePiece gp : contents){
-            if(gp instanceof CharacterPiece)
-                if(gp.isColliding(player)){
-                    
-                    playerSpawns.remove(save);
-                    spawnPlayer(player);
-                    playerSpawns.add(save);
-                    return;
-                }
-                    
-        }
-        
-        add(player);
     }
 }

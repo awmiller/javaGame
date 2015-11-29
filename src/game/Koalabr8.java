@@ -24,7 +24,7 @@ import map.Map;
  */
 public class Koalabr8 implements Runnable{
     public static char[] controls = {'w','a','s','d',' '};
-    public KeyController playerController = new KeyController(controls);
+    public static KeyController playerController = new KeyController(controls);
     
     private ArrayList<GamePiece> Koalas;
     private Map gameMap;
@@ -33,20 +33,26 @@ public class Koalabr8 implements Runnable{
     private static BufferedImage KoalaDead = Game.getSprite("/res/kbr8/Koala_dead.png");
     
     private int Score = 3;
-    private int NUMBER_OF_KOALAS =3;
-    private long FRAME_PERIOD_MILLIS = 40;
+    private int NUMBER_OF_KOALAS =6;
+    public static int FRAMES_PER_SECOND = 60;
+    private static double FRAME_PERIOD_MILLIS = (1000/FRAMES_PER_SECOND);
     
     public Koalabr8(){
         URL url = Game.class.getResource("/res/Koala1.map");
         try{
-            gameMap = new Map("Koala1.map");
+            gameMap = new Map("Koala2.map");
         }catch(Exception e){
             
         }
         gameView = new GameView();
         
         for(int i =0; i<=NUMBER_OF_KOALAS; i++){
-            gameMap.spawnPlayer(new CharacterPiece(KoalaImg,playerController,new Dimension(0,0)));
+            CharacterPiece cp = 
+                    new CharacterPiece(KoalaImg,playerController,
+                            new Dimension(0,0));
+            boolean b = gameMap.spawnPlayer(cp);
+            if(!b) break;
+            else cp.setSpeed(Map.wallDimension.width);
         }
         
     }
@@ -67,6 +73,8 @@ public class Koalabr8 implements Runnable{
         
         mainFrame.setFocusable(true);
         mainFrame.setVisible(true); 
+        
+        mainFrame.addKeyListener(playerController);
         
         Thread t = new Thread(game);
         t.start();
