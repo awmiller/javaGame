@@ -47,8 +47,17 @@ public class Map implements Observer{
     ArrayList<String> ListLines = new ArrayList<>();
     ArrayList<Dimension> pickupSpawns = new ArrayList<>();
     ArrayList<Dimension> playerSpawns = new ArrayList<>();
-    ArrayList<ExitPiece> Exits = new ArrayList<>();
+    ArrayList<Dimension> Exits = new ArrayList<>();
     HashMap<Dimension,Integer> wallSpawns = new HashMap<>();
+        
+    protected ArrayList<Dimension> YellowLocks = new ArrayList<>();
+    protected ArrayList<Dimension> RedLocks = new ArrayList<>();
+    protected ArrayList<Dimension> BlueLocks = new ArrayList<>();
+    
+    private int GameScore =0;
+    private int numLocks=0;
+    private int numSwitches=0;
+    public final int getScore() {return GameScore; }
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
     static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
@@ -195,32 +204,29 @@ public class Map implements Observer{
         for(GamePiece other : contents){
             
             if(other==gamePiece)continue;
-            
-            if(other.isRigid()){
-                if(other.isColliding(gamePiece)){
+    
+            if (other.isRigid()) {
+                if (other.isColliding(gamePiece)) {
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
-                    if(other.isColliding(gamePiece)){//disallow move if previous position is ok
+                    if (other.isColliding(gamePiece)) {//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
                         gamePiece.Location = newLocation;
-                    }else{
+                    } else {
                         //Apply onCollide()
                         other.onCollide(gamePiece);
                         gamePiece.onCollide(other);
                     }
                 }
-            }else{ //Not Rigid
-                if(other.isColliding(gamePiece) &&
-                        (other instanceof PowerUpPiece)){
-                    
-                        //Apply onCollide() to pickups
-                        other.onCollide(gamePiece);
-                        gamePiece.onCollide(other);
+            } else { //Apply non-Rigid collisions to ONLY these types:
+                if (other.isColliding(gamePiece)
+                        && (other instanceof LockSwitchPieces)) {
+                    other.onCollide(gamePiece);
                 }
             }
         }
     }
-    
+
     private boolean movesOutOfBounds(GamePiece gamePiece, Dimension newLocation) {
         int top = newLocation.height;
         int bot = newLocation.height + gamePiece.size.height;
@@ -374,6 +380,14 @@ public class Map implements Observer{
          */
         createWalls();
         source.close();
+        
+        /**
+         * Call initialize method on all game pieces
+         */
+        ArrayList<GamePiece> copy= (ArrayList<GamePiece>)contents.clone();
+        for(GamePiece gp: copy){
+            gp.onStartGame();
+        }
     }
 
     private void createWalls() {
@@ -388,15 +402,49 @@ public class Map implements Observer{
                 char c = line.charAt(lineProgress);
                 lineProgress += 1;
                 switch (c) {
+                    
+                    //Force Blank Space
+                    case '.': break;
+                        
                     case 'P':
                         playerSpawns.add(new Dimension(j,i));
+                        break;
+                    case 'H':
+                        add(new SawPiece(new Dimension(j,i),SawPiece.HORIZONTAL));
+                        break;
+                    case 'V':
+                        add(new SawPiece(new Dimension(j,i),SawPiece.VERTICAL));
                         break;
                         
                     case 't':
                         contents.add(new TnTPiece(new Dimension(j,i)));
                         break;
+                    case 'y':
+                        numLocks++;
+                        YellowLocks.add(new Dimension(j,i));
+                        break;
+                    case 'r':
+                        RedLocks.add(new Dimension(j,i));
+                        numLocks++;
+                        break;
+                    case 'b':
+                        BlueLocks.add(new Dimension(j,i));
+                        numLocks++;
+                        break;
+                        
+                    case 'R':
+                    case 'Y':
+                    case 'B':
+                        numSwitches++;
+                        contents.add(new LockSwitchPieces(new Dimension(j,i),c,this));
+                        break;
+                    case 's':
+                        contents.add(new StonePiece(new Dimension(j,i),this));
+                        break;
                     case 'e':
-                        contents.add(new ExitPiece(new Dimension(j,i)));
+                        Dimension dim = new Dimension(j,i);
+                        Exits.add(dim);
+                        contents.add(new ExitPiece(dim));
                         break;
 //      BotCenterWall;     // 
                     case ',':
@@ -505,13 +553,23 @@ public class Map implements Observer{
         ArrayList<GamePiece> copy = new ArrayList<>(contents);
         
         for(GamePiece gp : copy){
+            if(gp instanceof CharacterPiece){
+                for(Dimension d : Exits){
+                    if((Math.abs(d.width-gp.Location.width)<20) &&
+                       (Math.abs(d.height-gp.Location.height)<20)){
+                        GameScore++;
+                        contents.remove(gp);
+                    }
+                        
+                }
+            }
             if(gp.disposable()){
                 
                 remove(gp);
                 
                 gp.onDispose();
                 
-                if(gp instanceof CharacterPiece)
+                if(gp instanceof TnTPiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
                 else if(gp instanceof ProjectilePiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));

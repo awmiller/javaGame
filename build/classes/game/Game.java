@@ -5,9 +5,6 @@
  */
 package game;
 
-import map.MapView;
-import java.awt.BorderLayout;
-import map.Tiles;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,33 +13,24 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Transparency;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import map.CharacterPiece;
 import map.GamePiece;
 import map.Map;
-import map.ObstaclePiece;
+import map.MapView;
 import map.Tile;
 
 /**

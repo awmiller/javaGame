@@ -15,10 +15,12 @@ public class ObstaclePiece extends GamePiece {
     
     boolean Destructable = false;
     private int Health = 4;
+    private Dimension epsillonSize;
 
     public ObstaclePiece(BufferedImage image, Dimension location) {
         super(image, location);
         rigid = true;
+        epsillonSize = new Dimension(size.width,size.height);
     }   
 
     ObstaclePiece(BufferedImage image, Dimension location, boolean b) {
@@ -29,7 +31,7 @@ public class ObstaclePiece extends GamePiece {
 
     @Override
     public boolean isColliding(GamePiece other) {
-        Rectangle r1 = Game.getRectCollider(Location, size);
+        Rectangle r1 = Game.getRectCollider(Location,epsillonSize);
         return other.isColliding(r1);
     }
     

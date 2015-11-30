@@ -60,14 +60,23 @@ public class CharacterPiece extends GamePiece {
         }else{
             AnmState=0;
             NextMove = Game.ZERO_VECTOR;
-            if((Location.width%40>0)||(Location.height%40>0)){
-                if(Location.width%40 > 20){
-                    Location.width+= Location.width%20;
+            while((topLeft().width%40>0)||(topLeft().height%40>0)){
+                if(topLeft().width%40 > 20){
+                    Location.width+= 1;
+                }else if((topLeft().width%40) !=0){
+                    Location.width-= 1;
+                }else if(topLeft().height%40 > 20){
+                    Location.height+= 1;
                 }else{
-                    Location
+                    Location.height-= 1;
                 }
+                System.out.printf("Location %d,%d\n", topLeft().width,topLeft().height);
             }
         }
+    }
+    
+    private Dimension topLeft(){
+        return new Dimension(Location.width-size.width/2,Location.height-size.height/2);
     }
     
     private int speed;

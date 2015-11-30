@@ -6,10 +6,14 @@
 package game;
 
 import java.awt.Dimension;
+import java.awt.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.Stack;
 import map.*;
 
 /**
@@ -17,9 +21,9 @@ import map.*;
  * @author awmil_000
  */
 public class KeyController extends KeyAdapter{
-    public ArrayList<GameEvent> eventQueue;
+    public volatile ArrayDeque<Character> eventQueue;
         public KeyController(char[] map){
-            eventQueue = new ArrayList<>();
+            eventQueue = new ArrayDeque<>();
             UP_CHAR = map[0];
             LEFT_CHAR = map[1];
             DOWN_CHAR = map[2];
@@ -32,24 +36,28 @@ public class KeyController extends KeyAdapter{
         @Override
         public void keyPressed(KeyEvent e)
         {
+            int sz = eventQueue.size();
+            
             char code =e.getKeyChar();
             if(code==UP_CHAR){
-                if(!eventQueue.contains(MoveEvent.MoveUp))
-                    eventQueue.add(MoveEvent.MoveUp);
+                if(!eventQueue.contains(UP_CHAR))
+                    eventQueue.push(UP_CHAR);
             } else if(code==DOWN_CHAR){
-                if(!eventQueue.contains(MoveEvent.MoveDown))
-                    eventQueue.add(MoveEvent.MoveDown);
+                if(!eventQueue.contains(DOWN_CHAR))
+                    eventQueue.push(DOWN_CHAR);
             } else if(code==LEFT_CHAR){
-                if(!eventQueue.contains(MoveEvent.RotateLeft))
-                    eventQueue.add(MoveEvent.RotateLeft);
+                if(!eventQueue.contains(LEFT_CHAR))
+                    eventQueue.push(LEFT_CHAR);
             } else if(code==RIGHT_CHAR){
-                if(!eventQueue.contains(MoveEvent.RotateRight))
-                    eventQueue.add(MoveEvent.RotateRight);
+                if(!eventQueue.contains(RIGHT_CHAR))
+                    eventQueue.push(RIGHT_CHAR);
             } else if(code==FIRE_CHAR){
-                if(!eventQueue.contains(AttackEvent.PendingAttack))
-                    eventQueue.add(AttackEvent.PendingAttack);
+                if(!eventQueue.contains(FIRE_CHAR))
+                    eventQueue.push(FIRE_CHAR);
             }
-            //mModel.onEvent();
+            if(sz != eventQueue.size()){
+                mModel.onEvent();
+            }
             //System.out.println("KeyPressed!"+ e.getKeyChar());
         }
 
@@ -59,20 +67,20 @@ public class KeyController extends KeyAdapter{
         {
             char code =e.getKeyChar();
             if(code==UP_CHAR){
-                if(eventQueue.contains(MoveEvent.MoveUp))
-                    eventQueue.remove(MoveEvent.MoveUp);
+                if(eventQueue.contains(UP_CHAR))
+                    eventQueue.remove(UP_CHAR);
             } else if(code==DOWN_CHAR){
-                if(eventQueue.contains(MoveEvent.MoveDown))
-                    eventQueue.remove(MoveEvent.MoveDown);
+                if(eventQueue.contains(DOWN_CHAR))
+                    eventQueue.remove(DOWN_CHAR);
             } else if(code==LEFT_CHAR){
-                if(eventQueue.contains(MoveEvent.RotateLeft))
-                    eventQueue.remove(MoveEvent.RotateLeft);
+                if(eventQueue.contains(LEFT_CHAR))
+                    eventQueue.remove(LEFT_CHAR);
             } else if(code==RIGHT_CHAR){
-                if(eventQueue.contains(MoveEvent.RotateRight))
-                    eventQueue.remove(MoveEvent.RotateRight);
+                if(eventQueue.contains(RIGHT_CHAR))
+                    eventQueue.remove(RIGHT_CHAR);
             } else if(code==FIRE_CHAR){
-                if(eventQueue.contains(AttackEvent.PendingAttack))
-                    eventQueue.remove(AttackEvent.PendingAttack);
+                if(eventQueue.contains(FIRE_CHAR))
+                    eventQueue.remove(FIRE_CHAR);
             }else{
                 mModel.onEvent();  
             }
@@ -87,11 +95,11 @@ public class KeyController extends KeyAdapter{
             void onEvent();
         }
         
-        private final char UP_CHAR;
-        private final char DOWN_CHAR;
-        private final char LEFT_CHAR;
-        private final char RIGHT_CHAR;
-        private final char FIRE_CHAR;
+        public final char UP_CHAR;
+        public final char DOWN_CHAR;
+        public final char LEFT_CHAR;
+        public final char RIGHT_CHAR;
+        public final char FIRE_CHAR;
         
         
     }

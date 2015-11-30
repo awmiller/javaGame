@@ -13,6 +13,7 @@ import java.awt.image.ImageObserver;
 import java.util.Observable;
 import java.util.Observer;
 import game.Game;
+import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Area;
 
@@ -49,8 +50,9 @@ public abstract class GamePiece extends Observable{
     }
     
     public boolean isColliding(GamePiece other) {
-        int distance = Game.distance(this.Location,other.Location);
-        return distance<(this.collideRadius()+other.collideRadius());
+        return isColliding(Game.getRectCollider(other.Location, other.size));
+//        int distance = Game.distance(this.Location,other.Location);
+//        return distance<(this.collideRadius()+other.collideRadius());
     }
 
     public boolean drawsBefore(GamePiece obj) {
@@ -59,6 +61,8 @@ public abstract class GamePiece extends Observable{
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(Image,Location.width-size.width/2, Location.height-size.height/2,(ImageObserver)null);
+        g2d.setColor(Color.RED);
+        g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
     }
 
     boolean isRigid() {
@@ -109,5 +113,9 @@ public abstract class GamePiece extends Observable{
 
     public int collideRadius() {
         return radius();
+    }
+
+    public Dimension getMove() {
+        return NextMove;
     }
 }

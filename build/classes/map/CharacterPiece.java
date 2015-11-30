@@ -9,35 +9,80 @@ import game.AttackEvent;
 import game.Game;
 import game.KeyController;
 import game.MoveEvent;
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.Observable;
 
 
 public class CharacterPiece extends GamePiece {
     
+    
+    public Dimension CurrentMove= Game.ZERO_VECTOR;
     private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
     private static int epsillon = 20;
     public static final BufferedImage weaponStrip = Game.getSprite("/res/Weapon_strip3.png");
     public static final BufferedImage shieldImg = Game.getSprite("/res/Shield1.png");
     
+    private FrameAnimator mFrameAnimator = new KoalaAnimator();
+    public void setAnimator(FrameAnimator anm){
+        mFrameAnimator = anm;
+    }
+    private int AnmState =0;
+    
+    private static final int MOVETIMER_RELOAD =40;
+    private int MoveTimer = 0;
+    private void setMoveTimer(){
+        if(mControlls.eventQueue.size()>0){
+            MoveTimer = MOVETIMER_RELOAD;
+            Character c = mControlls.eventQueue.peek();
+            if (c.equals(mControlls.UP_CHAR)) {
+                NextMove = new Dimension(0,-1);
+                AnmState = 2;
+            }
+            else if (c.equals(mControlls.DOWN_CHAR)) {
+                NextMove = new Dimension(0,1);
+                AnmState =1;
+            }
+            else if (c.equals(mControlls.LEFT_CHAR)) {
+                NextMove = new Dimension(-1,0);
+                AnmState = 3;
+            }
+            else if (c.equals(mControlls.RIGHT_CHAR)) {
+                NextMove = new Dimension(1,0);
+                AnmState=4;
+            }
+        }else{
+            AnmState=0;
+            NextMove = Game.ZERO_VECTOR;
+            while((topLeft().width%40>0)||(topLeft().height%40>0)){
+                if(topLeft().width%40 > 20){
+                    Location.width+= 1;
+                }else if((topLeft().width%40) !=0){
+                    Location.width-= 1;
+                }else if(topLeft().height%40 > 20){
+                    Location.height+= 1;
+                }else{
+                    Location.height-= 1;
+                }
+                System.out.printf("Location %d,%d\n", topLeft().width,topLeft().height);
+            }
+        }
+    }
+    
+    private Dimension topLeft(){
+        return new Dimension(Location.width-size.width/2,Location.height-size.height/2);
+    }
     
     private int speed;
     int SpeedDivider = 4;
     int BoostDuration = 0;
+    private Dimension ThisMove = Game.ZERO_VECTOR;
     public void boostSpeed(int duration){
         if(BoostDuration > 0) 
         {
@@ -48,6 +93,10 @@ public class CharacterPiece extends GamePiece {
         speed = 12;
         equippedWeapon.attackSpeed=20;
         BoostDuration = duration;
+    }
+    public int setSpeed(int newSpeed){
+        speed = newSpeed;
+        return speed;
     }
     
     private int maxHealth = 60;
@@ -110,41 +159,44 @@ public class CharacterPiece extends GamePiece {
         speed = 6;
         this.rigid =true;
         Health = maxHealth;
+        
+        mFrameAnimator.setAnimating(true);
+        CurrentMove = Location;
     }
 
     @Override
     public void draw(Graphics2D g2d) {
-
-        AffineTransformOp atxop = new AffineTransformOp(rotation,AffineTransformOp.TYPE_BILINEAR);
-
-        g2d.drawImage(super.Image, atxop, Location.width-size.width/2, Location.height-size.height/2);
+        mFrameAnimator.update(AnmState);
         
-        float percent = (float)Health/(float)maxHealth;
-        int red = Math.round(255 - (float)Math.pow(255, percent));
-        int green = Math.round((float)Math.pow(255, percent));//
-        g2d.setColor(new Color(red,green,0,255));
-        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
+        g2d.drawImage(mFrameAnimator.getFrame(), Location.width-size.width/2, Location.height-size.height/2,null);
         
-        if(equippedWeapon.Subtype==AttackEvent.BOUNCING_ATTACK){
-            g2d.drawImage(
-                    weaponStrip.getSubimage(weaponStrip.getWidth()/3,0, 
-                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-                    Location.width-size.width/2, 
-                    Location.height+size.height/2 - weaponStrip.getHeight(),
-                    null);
-        }else if(equippedWeapon.Subtype==AttackEvent.MISSILE_ATTACK){
-            g2d.drawImage(
-                    weaponStrip.getSubimage(0,0, 
-                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-                    Location.width-size.width/2, 
-                    Location.height+size.height/2 - weaponStrip.getHeight(),
-                    null);
-        }
-        if(Armor > 0){
-            g2d.drawImage(shieldImg, 
-                    Location.width-shieldImg.getWidth()/2,
-                    Location.height-shieldImg.getHeight()/2,null);
-        }
+        
+//        float percent = (float)Health/(float)maxHealth;
+//        int red = Math.round(255 - (float)Math.pow(255, percent));
+//        int green = Math.round((float)Math.pow(255, percent));//
+        g2d.setColor(Color.RED);
+//        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
+        g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
+//        if(equippedWeapon.Subtype==AttackEvent.BOUNCING_ATTACK){
+//            g2d.drawImage(
+//                    weaponStrip.getSubimage(weaponStrip.getWidth()/3,0, 
+//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
+//                    Location.width-size.width/2, 
+//                    Location.height+size.height/2 - weaponStrip.getHeight(),
+//                    null);
+//        }else if(equippedWeapon.Subtype==AttackEvent.MISSILE_ATTACK){
+//            g2d.drawImage(
+//                    weaponStrip.getSubimage(0,0, 
+//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
+//                    Location.width-size.width/2, 
+//                    Location.height+size.height/2 - weaponStrip.getHeight(),
+//                    null);
+//        }
+//        if(Armor > 0){
+//            g2d.drawImage(shieldImg, 
+//                    Location.width-shieldImg.getWidth()/2,
+//                    Location.height-shieldImg.getHeight()/2,null);
+//        }
     }
     
     
@@ -156,8 +208,7 @@ public class CharacterPiece extends GamePiece {
         
 
         @Override
-        public void onEvent() {
-            
+        public void onEvent() {          
         }
     };
     
@@ -168,7 +219,6 @@ public class CharacterPiece extends GamePiece {
     public void move() {
         FrameCount++;
         hasMoved = true;
-        NextMove = Game.ZERO_VECTOR;
         int move = 0;
         
         if(AttackCooldown >0){
@@ -193,43 +243,25 @@ public class CharacterPiece extends GamePiece {
                 equippedWeapon = AttackEvent.BulletAttack;
             }
         }
-
-        if (mControlls.eventQueue.contains(MoveEvent.RotateRight)) {
-            setChanged();
-            heading += RADIANS_PER_FRAME;
-            rotation.rotate(RADIANS_PER_FRAME,size.width/2,size.height/2);
-
-        }
-        if (mControlls.eventQueue.contains(MoveEvent.RotateLeft)) {
-            setChanged();
-            heading -= RADIANS_PER_FRAME;
-            rotation.rotate(-RADIANS_PER_FRAME,size.width/2,size.height/2);
-        }
-
-        if (mControlls.eventQueue.contains(MoveEvent.MoveUp)) {
-            setChanged();
-            move -= speed;
-        }
-        if (mControlls.eventQueue.contains(MoveEvent.MoveDown)) {
-            setChanged();
-            move += speed;
-        }
         
-        NextMove = Game.rotate(move, heading);
-        
-        if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
-            if(AttackCooldown ==0){
-                AttackCooldown = Game.FRAMES_PER_SECOND/SpeedDivider;
-                setChanged();
-                notifyObservers(equippedWeapon);
-                clearChanged();
-//                if(equippedWeapon == AttackEvent.SuperBouncingAttack){
-//                    WeaponEquipDuration =2;
-//                }
-                return;
-            }
+        if(MoveTimer >1){
+            MoveTimer--;
+        }else{
+            setMoveTimer();
         }
-
+            
+        
+//        if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
+//            if(AttackCooldown ==0){
+//                AttackCooldown = Game.FRAMES_PER_SECOND/SpeedDivider;
+//                setChanged();
+//                notifyObservers(equippedWeapon);
+//                clearChanged();
+//                return;
+//            }
+//        }
+        
+        setChanged();
         notifyObservers();
         clearChanged();
     }
@@ -275,6 +307,7 @@ public class CharacterPiece extends GamePiece {
     public void onRespawn(){
         super.onRespawn();
         Health = maxHealth;
+        CurrentMove = Location;
     }
     
     @Override
@@ -307,9 +340,11 @@ public class CharacterPiece extends GamePiece {
 
     @Override
     boolean isColliding(Rectangle R1) {
-        Shape s = new Ellipse2D.Double(Location.width-size.width/2+epsillon/2,
-                Location.height-size.height/2+epsillon/2,
-                size.width-epsillon,size.height-epsillon);
+        Shape s = new Rectangle(Location.width-size.width/2,Location.height-size.height/2,
+                size.width,size.height);
+//        Ellipse2D.Double(Location.width-size.width/2+epsillon/2,
+//                Location.height-size.height/2+epsillon/2,
+//                size.width-epsillon,size.height-epsillon);
         return s.intersects(R1);
     }
     
