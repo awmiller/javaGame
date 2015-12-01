@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
  * State machine for animating motion frame-by-frame
  * @author Andros
  */
-abstract class FrameAnimator {
+public abstract class FrameAnimator {
     private int state;
     private int FrameCount;
     private int TransitionFrameLimit;

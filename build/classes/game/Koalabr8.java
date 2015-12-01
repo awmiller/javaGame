@@ -100,7 +100,7 @@ public class Koalabr8 implements Runnable{
     public void setMap(String mapname) throws Exception{ 
         gameMap = new Map(mapname);
         targetScore = 0;
-        while(gameMap.spawnPlayer(new CharacterPiece(KoalaImg,playerController,Game.ZERO_VECTOR))){
+        while(gameMap.spawnPlayer(new KoalaPiece(KoalaImg,playerController,Game.ZERO_VECTOR))){
             targetScore++;
         }
     }

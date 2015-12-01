@@ -29,57 +29,7 @@ public class CharacterPiece extends GamePiece {
     public static final BufferedImage weaponStrip = Game.getSprite("/res/Weapon_strip3.png");
     public static final BufferedImage shieldImg = Game.getSprite("/res/Shield1.png");
     
-    private FrameAnimator mFrameAnimator = new KoalaAnimator();
-    public void setAnimator(FrameAnimator anm){
-        mFrameAnimator = anm;
-    }
-    private int AnmState =0;
-    
-    private static final int MOVETIMER_RELOAD =40;
-    private int MoveTimer = 0;
-    private void setMoveTimer(){
-        if(mControlls.eventQueue.size()>0){
-            MoveTimer = MOVETIMER_RELOAD;
-            Character c = mControlls.eventQueue.peek();
-            if (c.equals(mControlls.UP_CHAR)) {
-                NextMove = new Dimension(0,-1);
-                AnmState = 2;
-            }
-            else if (c.equals(mControlls.DOWN_CHAR)) {
-                NextMove = new Dimension(0,1);
-                AnmState =1;
-            }
-            else if (c.equals(mControlls.LEFT_CHAR)) {
-                NextMove = new Dimension(-1,0);
-                AnmState = 3;
-            }
-            else if (c.equals(mControlls.RIGHT_CHAR)) {
-                NextMove = new Dimension(1,0);
-                AnmState=4;
-            }
-        }else{
-            AnmState=0;
-            
-            while((topLeft().width%40>0)||(topLeft().height%40>0)){
-                if(topLeft().width%40 > 20){
-                    NextMove = new Dimension(1,0);
-                }else if((topLeft().width%40) !=0){
-                    NextMove = new Dimension(-1,0);
-                }else if(topLeft().height%40 > 20){
-                    NextMove = new Dimension(0,1);
-                }else{
-                    NextMove = new Dimension(0,-1);
-                }
-                System.out.printf("Location %d,%d\n", topLeft().width,topLeft().height);
-                setChanged();
-                notifyObservers();
-                clearChanged();
-            }
-            NextMove = Game.ZERO_VECTOR;
-        }
-    }
-    
-    private Dimension topLeft(){
+    protected Dimension topLeft(){
         return new Dimension(Location.width-size.width/2,Location.height-size.height/2);
     }
     
@@ -163,17 +113,15 @@ public class CharacterPiece extends GamePiece {
         speed = 6;
         this.rigid =true;
         Health = maxHealth;
-        
-        mFrameAnimator.setAnimating(true);
         CurrentMove = Location;
     }
 
     @Override
     public void draw(Graphics2D g2d) {
-        mFrameAnimator.update(AnmState);
-        
-        g2d.drawImage(mFrameAnimator.getFrame(), Location.width-size.width/2, Location.height-size.height/2,null);
-        
+//        mFrameAnimator.update(AnmState);
+//        
+//        g2d.drawImage(mFrameAnimator.getFrame(), Location.width-size.width/2, Location.height-size.height/2,null);
+//        
         
 //        float percent = (float)Health/(float)maxHealth;
 //        int red = Math.round(255 - (float)Math.pow(255, percent));
@@ -187,15 +135,15 @@ public class CharacterPiece extends GamePiece {
  
     
     public AffineTransform rotation = new AffineTransform();
-    private KeyController mControlls;
+    public KeyController mControlls;
     private KeyController.ControlModelInterface mcmi = new KeyController.ControlModelInterface() {
         @Override
         public void onEvent() {          
         }
     };
     
-    int FrameCount = 0;
-    int AttackCooldown = 0;
+    protected int FrameCount = 0;
+    protected int AttackCooldown = 0;
 
     @Override
     public void move() {
@@ -224,12 +172,6 @@ public class CharacterPiece extends GamePiece {
                 Power = 5;
                 equippedWeapon = AttackEvent.BulletAttack;
             }
-        }
-        
-        if(MoveTimer >1){
-            MoveTimer--;
-        }else{
-            setMoveTimer();
         }
         
         setChanged();
@@ -284,30 +226,7 @@ public class CharacterPiece extends GamePiece {
     @Override
     public int collideRadius() {
         return radius() - epsillon;
-    }    
-    
-    
-//
-//    @Override
-//    public boolean isColliding(GamePiece other) {
-//        return
-//        (getCollider().intersects(other.getCollider().getBounds())) &&
-//        (other.getCollider().intersects(getCollider().getBounds()));
-//    }
-//    
-
-//    @Override
-//    public Shape getCollider() {
-//        Dimension topl = new Dimension(
-//                Location.width - size.width/2 + epsillon,
-//                Location.height - size.height/2 + epsillon);
-//        Dimension sz = new Dimension( 
-//                size.width - 2*epsillon,
-//                size.height - 2*epsillon);
-//        AffineTransform af = new AffineTransform();
-//        af.rotate(heading, Location.width, Location.height);
-//        return af.createTransformedShape(new Rectangle(topl.width,topl.height,sz.width,sz.height));
-//    }
+    }
 
     @Override
     boolean isColliding(Rectangle R1) {
