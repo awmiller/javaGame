@@ -200,6 +200,9 @@ public class Map implements Observer{
     public void movePieceIfAble(GamePiece gamePiece, MoveEvent moveEvent) {        
         Dimension newLocation = Game.add(gamePiece.Location,moveEvent.vector);
         Dimension oldLocation = new Dimension(gamePiece.Location);
+        if(movesOutOfBounds(gamePiece,newLocation)){
+            return;
+        }
         gamePiece.Location = newLocation;
         for(GamePiece other : contents){
             
@@ -228,9 +231,9 @@ public class Map implements Observer{
     }
 
     private boolean movesOutOfBounds(GamePiece gamePiece, Dimension newLocation) {
-        int top = newLocation.height;
-        int bot = newLocation.height + gamePiece.size.height;
-        int left = newLocation.width;
+        int top = newLocation.height- gamePiece.size.height/2;
+        int bot = newLocation.height + gamePiece.size.height/2;
+        int left = newLocation.width- gamePiece.size.width;
         int right = newLocation.width + gamePiece.size.width;
         
         return (top<0)||(bot>corner.height)||(left<0)||(right>corner.width);
@@ -559,6 +562,7 @@ public class Map implements Observer{
                        (Math.abs(d.height-gp.Location.height)<20)){
                         GameScore++;
                         contents.remove(gp);
+                        Game.playClip("/res/kbr8/Saved.wav");
                     }
                         
                 }
@@ -570,15 +574,7 @@ public class Map implements Observer{
                 gp.onDispose();
                 
                 if(gp instanceof TnTPiece)
-                    add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
-                else if(gp instanceof ProjectilePiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));
-                else if(gp instanceof PowerUpPiece){
-                    pickupSpawns.add(gp.Location);
-                }
-                else if(gp instanceof ObstaclePiece){
-                    wallSpawns.put(gp.Location, Game.FRAMES_PER_SECOND*20);
-                }
             }
             
         }

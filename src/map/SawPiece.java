@@ -48,6 +48,7 @@ class SawPiece extends GamePiece {
     public void onCollide(GamePiece collider) {
         if(collider instanceof CharacterPiece){
             collider.dispose = true;
+            Game.playClip("/res/kbr8/Saw.wav");
         }
         else{
             speed = -speed;

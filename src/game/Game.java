@@ -144,32 +144,34 @@ public class Game extends JFrame implements Runnable{
         gameMap.spawnPlayer(player2);
     }
     
-    
-    public static void main(String args[]) {
-        if(ENABLE_MUSIC)
-        try {
-            URL defaultSound = Game.class.getResource("/res/Music.mid");
-            //System.out.print("\n"+defaultSound.toString());
-            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
-//            File soundFile = new File(defaultSound.toURI());
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
-        } catch (Exception e) {
-            System.out.print("\n"+e.toString());
-        }
-        
-        JFrame runner = new Game(TILES_PER_DIMENSION);
-//        runner.pack();
-        runner.setFocusable(true);
-        runner.setVisible(true); 
-//        ((Game)runner).otherframe.setVisible(true);
-//        ((Game)runner).otherframe.setFocusable(true);
-        Thread game = new Thread((Runnable) runner);
-        game.start();
-        
-    }
+    /**
+     * DONT USE THIS MAIN. TANK GAME BROKEN AFTER KOALABR8
+     */
+//    public static void main(String args[]) {
+//        if(ENABLE_MUSIC)
+//        try {
+//            URL defaultSound = Game.class.getResource("/res/Music.mid");
+//            //System.out.print("\n"+defaultSound.toString());
+//            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
+////            File soundFile = new File(defaultSound.toURI());
+//            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
+//            Clip clip = AudioSystem.getClip();
+//            clip.open(audioInputStream);
+//            clip.loop(Clip.LOOP_CONTINUOUSLY);
+//        } catch (Exception e) {
+//            System.out.print("\n"+e.toString());
+//        }
+//        
+//        JFrame runner = new Game(TILES_PER_DIMENSION);
+////        runner.pack();
+//        runner.setFocusable(true);
+//        runner.setVisible(true); 
+////        ((Game)runner).otherframe.setVisible(true);
+////        ((Game)runner).otherframe.setFocusable(true);
+//        Thread game = new Thread((Runnable) runner);
+//        game.start();
+//        
+//    }
 
     
     @Override

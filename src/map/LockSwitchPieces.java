@@ -59,10 +59,12 @@ class LockSwitchPieces extends GamePiece {
             rigid = true;
         }
         public int reset =0;
-        public int resetValue = 500;
-        public void flip(){
+        public int resetValue = 300;
+        public void flip(){flip(resetValue);}
+        public void flip(int reload){
             if(reset==0){
-                reset = resetValue;
+                reset = reload;
+                Game.playClip("/res/kbr8/Click.wav");
             }
         }
 
@@ -79,6 +81,7 @@ class LockSwitchPieces extends GamePiece {
                     if (!mContainer.contents.contains(this)) {
                         mContainer.add(this);
                         this.dispose = false;
+                        Game.playClip("/res/kbr8/Lock.wav");
                     }
                 }
             }
@@ -113,6 +116,9 @@ class LockSwitchPieces extends GamePiece {
     @Override
     public void onCollide(GamePiece collider) {
         thisLock.dispose = true;
+        if(collider instanceof StonePiece){
+            thisLock.flip(100000);
+        }
     }
 
     @Override
