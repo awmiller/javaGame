@@ -21,4 +21,6 @@ class KoalaPiece extends CharacterPiece {
         super(KoalaImg,playerController,location);
     }
     
+    
+    
 }
