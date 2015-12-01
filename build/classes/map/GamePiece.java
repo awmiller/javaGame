@@ -118,4 +118,8 @@ public abstract class GamePiece extends Observable{
     public Dimension getMove() {
         return NextMove;
     }
+    
+    public void onStartGame(){
+        
+    }
 }

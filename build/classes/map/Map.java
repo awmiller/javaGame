@@ -49,8 +49,14 @@ public class Map implements Observer{
     ArrayList<Dimension> playerSpawns = new ArrayList<>();
     ArrayList<Dimension> Exits = new ArrayList<>();
     HashMap<Dimension,Integer> wallSpawns = new HashMap<>();
+        
+    protected ArrayList<Dimension> YellowLocks = new ArrayList<>();
+    protected ArrayList<Dimension> RedLocks = new ArrayList<>();
+    protected ArrayList<Dimension> BlueLocks = new ArrayList<>();
     
     private int GameScore =0;
+    private int numLocks=0;
+    private int numSwitches=0;
     public final int getScore() {return GameScore; }
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
@@ -194,40 +200,45 @@ public class Map implements Observer{
     public void movePieceIfAble(GamePiece gamePiece, MoveEvent moveEvent) {        
         Dimension newLocation = Game.add(gamePiece.Location,moveEvent.vector);
         Dimension oldLocation = new Dimension(gamePiece.Location);
+        if(movesOutOfBounds(gamePiece,newLocation)){
+            return;
+        }
         gamePiece.Location = newLocation;
         for(GamePiece other : contents){
             
             if(other==gamePiece)continue;
-            
-            if(other.isRigid()){
-                if(other.isColliding(gamePiece)){
+    
+            if (other.isRigid()) {
+                if (other.isColliding(gamePiece)) {
                     //if new position is colliding
                     gamePiece.Location = oldLocation;
-                    if(other.isColliding(gamePiece)){//disallow move if previous position is ok
+                    if (other.isColliding(gamePiece)) {//disallow move if previous position is ok
                         //if old position is colliding too, prefer new position
                         gamePiece.Location = newLocation;
-                    }else{
+                    } else {
                         //Apply onCollide()
                         other.onCollide(gamePiece);
                         gamePiece.onCollide(other);
                     }
                 }
-            }else{ //Not Rigid
-                if(other.isColliding(gamePiece) &&
-                        (other instanceof PowerUpPiece)){
-                    
-                        //Apply onCollide() to pickups
-                        other.onCollide(gamePiece);
-                        gamePiece.onCollide(other);
+            } else { //Apply non-Rigid collisions to ONLY these types:
+                if (other.isColliding(gamePiece)
+                        && (other instanceof LockSwitchPieces)) {
+                    other.onCollide(gamePiece);
                 }
+//                if (other.isColliding(gamePiece)
+//                        && (other instanceof SawPiece)) {
+//                    other.onCollide(gamePiece);
+//                    gamePiece.onCollide(other);
+//                }
             }
         }
     }
-    
+
     private boolean movesOutOfBounds(GamePiece gamePiece, Dimension newLocation) {
-        int top = newLocation.height;
-        int bot = newLocation.height + gamePiece.size.height;
-        int left = newLocation.width;
+        int top = newLocation.height- gamePiece.size.height/2;
+        int bot = newLocation.height + gamePiece.size.height/2;
+        int left = newLocation.width- gamePiece.size.width;
         int right = newLocation.width + gamePiece.size.width;
         
         return (top<0)||(bot>corner.height)||(left<0)||(right>corner.width);
@@ -377,6 +388,14 @@ public class Map implements Observer{
          */
         createWalls();
         source.close();
+        
+        /**
+         * Call initialize method on all game pieces
+         */
+        ArrayList<GamePiece> copy= (ArrayList<GamePiece>)contents.clone();
+        for(GamePiece gp: copy){
+            gp.onStartGame();
+        }
     }
 
     private void createWalls() {
@@ -391,18 +410,41 @@ public class Map implements Observer{
                 char c = line.charAt(lineProgress);
                 lineProgress += 1;
                 switch (c) {
+                    
+                    //Force Blank Space
+                    case '.': break;
+                        
                     case 'P':
                         playerSpawns.add(new Dimension(j,i));
                         break;
                     case 'H':
-                        contents.add(new SawPiece(new Dimension(j,i),SawPiece.HORIZONTAL));
+                        add(new SawPiece(new Dimension(j,i),SawPiece.HORIZONTAL));
                         break;
                     case 'V':
-                        contents.add(new SawPiece(new Dimension(j,i),SawPiece.VERTICAL));
+                        add(new SawPiece(new Dimension(j,i),SawPiece.VERTICAL));
                         break;
                         
                     case 't':
                         contents.add(new TnTPiece(new Dimension(j,i)));
+                        break;
+                    case 'y':
+                        numLocks++;
+                        YellowLocks.add(new Dimension(j,i));
+                        break;
+                    case 'r':
+                        RedLocks.add(new Dimension(j,i));
+                        numLocks++;
+                        break;
+                    case 'b':
+                        BlueLocks.add(new Dimension(j,i));
+                        numLocks++;
+                        break;
+                        
+                    case 'R':
+                    case 'Y':
+                    case 'B':
+                        numSwitches++;
+                        contents.add(new LockSwitchPieces(new Dimension(j,i),c,this));
                         break;
                     case 's':
                         contents.add(new StonePiece(new Dimension(j,i),this));
@@ -525,6 +567,7 @@ public class Map implements Observer{
                        (Math.abs(d.height-gp.Location.height)<20)){
                         GameScore++;
                         contents.remove(gp);
+                        Game.playClip("/res/kbr8/Saved.wav");
                     }
                         
                 }
@@ -536,15 +579,7 @@ public class Map implements Observer{
                 gp.onDispose();
                 
                 if(gp instanceof TnTPiece)
-                    add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.LARGE));
-                else if(gp instanceof ProjectilePiece)
                     add(ExplosionAnimation.getExplosion(gp.Location,ExplosionAnimation.SMALL));
-                else if(gp instanceof PowerUpPiece){
-                    pickupSpawns.add(gp.Location);
-                }
-                else if(gp instanceof ObstaclePiece){
-                    wallSpawns.put(gp.Location, Game.FRAMES_PER_SECOND*20);
-                }
             }
             
         }

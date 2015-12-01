@@ -226,6 +226,11 @@ public class Map implements Observer{
                         && (other instanceof LockSwitchPieces)) {
                     other.onCollide(gamePiece);
                 }
+//                if (other.isColliding(gamePiece)
+//                        && (other instanceof SawPiece)) {
+//                    other.onCollide(gamePiece);
+//                    gamePiece.onCollide(other);
+//                }
             }
         }
     }

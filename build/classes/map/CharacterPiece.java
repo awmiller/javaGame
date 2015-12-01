@@ -59,19 +59,23 @@ public class CharacterPiece extends GamePiece {
             }
         }else{
             AnmState=0;
-            NextMove = Game.ZERO_VECTOR;
+            
             while((topLeft().width%40>0)||(topLeft().height%40>0)){
                 if(topLeft().width%40 > 20){
-                    Location.width+= 1;
+                    NextMove = new Dimension(1,0);
                 }else if((topLeft().width%40) !=0){
-                    Location.width-= 1;
+                    NextMove = new Dimension(-1,0);
                 }else if(topLeft().height%40 > 20){
-                    Location.height+= 1;
+                    NextMove = new Dimension(0,1);
                 }else{
-                    Location.height-= 1;
+                    NextMove = new Dimension(0,-1);
                 }
                 System.out.printf("Location %d,%d\n", topLeft().width,topLeft().height);
+                setChanged();
+                notifyObservers();
+                clearChanged();
             }
+            NextMove = Game.ZERO_VECTOR;
         }
     }
     
@@ -177,26 +181,6 @@ public class CharacterPiece extends GamePiece {
         g2d.setColor(Color.RED);
 //        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
         g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
-//        if(equippedWeapon.Subtype==AttackEvent.BOUNCING_ATTACK){
-//            g2d.drawImage(
-//                    weaponStrip.getSubimage(weaponStrip.getWidth()/3,0, 
-//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-//                    Location.width-size.width/2, 
-//                    Location.height+size.height/2 - weaponStrip.getHeight(),
-//                    null);
-//        }else if(equippedWeapon.Subtype==AttackEvent.MISSILE_ATTACK){
-//            g2d.drawImage(
-//                    weaponStrip.getSubimage(0,0, 
-//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-//                    Location.width-size.width/2, 
-//                    Location.height+size.height/2 - weaponStrip.getHeight(),
-//                    null);
-//        }
-//        if(Armor > 0){
-//            g2d.drawImage(shieldImg, 
-//                    Location.width-shieldImg.getWidth()/2,
-//                    Location.height-shieldImg.getHeight()/2,null);
-//        }
     }
     
     
@@ -205,8 +189,6 @@ public class CharacterPiece extends GamePiece {
     public AffineTransform rotation = new AffineTransform();
     private KeyController mControlls;
     private KeyController.ControlModelInterface mcmi = new KeyController.ControlModelInterface() {
-        
-
         @Override
         public void onEvent() {          
         }
@@ -249,17 +231,6 @@ public class CharacterPiece extends GamePiece {
         }else{
             setMoveTimer();
         }
-            
-        
-//        if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
-//            if(AttackCooldown ==0){
-//                AttackCooldown = Game.FRAMES_PER_SECOND/SpeedDivider;
-//                setChanged();
-//                notifyObservers(equippedWeapon);
-//                clearChanged();
-//                return;
-//            }
-//        }
         
         setChanged();
         notifyObservers();

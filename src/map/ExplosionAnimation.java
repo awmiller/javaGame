@@ -24,7 +24,7 @@ class ExplosionAnimation extends GamePiece {
     static BufferedImage smallImage = Game.getSprite("/res/Explosion_small.png");
     static BufferedImage largeImage = Game.getSprite("/res/Explosion_large.png");
     
-    private static String SMALL_SOUND = "/res/kbr8/Explosion.wav";
+    private static String SMALL_SOUND = "/res/Explosion_small.wav";
     private static String LARGE_SOUND = "/res/Explosion_large.wav";
     
     static{

@@ -59,19 +59,30 @@ public class CharacterPiece extends GamePiece {
             }
         }else{
             AnmState=0;
-            NextMove = Game.ZERO_VECTOR;
+            
             while((topLeft().width%40>0)||(topLeft().height%40>0)){
+                
+                Dimension oldLocation = Location;
+                
                 if(topLeft().width%40 > 20){
-                    Location.width+= 1;
+                    NextMove = new Dimension(1,0);
                 }else if((topLeft().width%40) !=0){
-                    Location.width-= 1;
+                    NextMove = new Dimension(-1,0);
                 }else if(topLeft().height%40 > 20){
-                    Location.height+= 1;
+                    NextMove = new Dimension(0,1);
                 }else{
-                    Location.height-= 1;
+                    NextMove = new Dimension(0,-1);
                 }
                 System.out.printf("Location %d,%d\n", topLeft().width,topLeft().height);
+                setChanged();
+                notifyObservers();
+                clearChanged();
+                
+                if(oldLocation.equals(Location)){
+                    break;
+                }
             }
+            NextMove = Game.ZERO_VECTOR;
         }
     }
     
@@ -177,26 +188,6 @@ public class CharacterPiece extends GamePiece {
         g2d.setColor(Color.RED);
 //        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
         g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
-//        if(equippedWeapon.Subtype==AttackEvent.BOUNCING_ATTACK){
-//            g2d.drawImage(
-//                    weaponStrip.getSubimage(weaponStrip.getWidth()/3,0, 
-//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-//                    Location.width-size.width/2, 
-//                    Location.height+size.height/2 - weaponStrip.getHeight(),
-//                    null);
-//        }else if(equippedWeapon.Subtype==AttackEvent.MISSILE_ATTACK){
-//            g2d.drawImage(
-//                    weaponStrip.getSubimage(0,0, 
-//                            weaponStrip.getWidth()/3, weaponStrip.getHeight()),
-//                    Location.width-size.width/2, 
-//                    Location.height+size.height/2 - weaponStrip.getHeight(),
-//                    null);
-//        }
-//        if(Armor > 0){
-//            g2d.drawImage(shieldImg, 
-//                    Location.width-shieldImg.getWidth()/2,
-//                    Location.height-shieldImg.getHeight()/2,null);
-//        }
     }
     
     
@@ -205,15 +196,13 @@ public class CharacterPiece extends GamePiece {
     public AffineTransform rotation = new AffineTransform();
     private KeyController mControlls;
     private KeyController.ControlModelInterface mcmi = new KeyController.ControlModelInterface() {
-        
-
         @Override
         public void onEvent() {          
         }
     };
     
-    int FrameCount = 0;
-    int AttackCooldown = 0;
+    protected int FrameCount = 0;
+    protected int AttackCooldown = 0;
 
     @Override
     public void move() {
@@ -249,17 +238,6 @@ public class CharacterPiece extends GamePiece {
         }else{
             setMoveTimer();
         }
-            
-        
-//        if(mControlls.eventQueue.contains(AttackEvent.PendingAttack)){
-//            if(AttackCooldown ==0){
-//                AttackCooldown = Game.FRAMES_PER_SECOND/SpeedDivider;
-//                setChanged();
-//                notifyObservers(equippedWeapon);
-//                clearChanged();
-//                return;
-//            }
-//        }
         
         setChanged();
         notifyObservers();
@@ -313,30 +291,7 @@ public class CharacterPiece extends GamePiece {
     @Override
     public int collideRadius() {
         return radius() - epsillon;
-    }    
-    
-    
-//
-//    @Override
-//    public boolean isColliding(GamePiece other) {
-//        return
-//        (getCollider().intersects(other.getCollider().getBounds())) &&
-//        (other.getCollider().intersects(getCollider().getBounds()));
-//    }
-//    
-
-//    @Override
-//    public Shape getCollider() {
-//        Dimension topl = new Dimension(
-//                Location.width - size.width/2 + epsillon,
-//                Location.height - size.height/2 + epsillon);
-//        Dimension sz = new Dimension( 
-//                size.width - 2*epsillon,
-//                size.height - 2*epsillon);
-//        AffineTransform af = new AffineTransform();
-//        af.rotate(heading, Location.width, Location.height);
-//        return af.createTransformedShape(new Rectangle(topl.width,topl.height,sz.width,sz.height));
-//    }
+    }
 
     @Override
     boolean isColliding(Rectangle R1) {
