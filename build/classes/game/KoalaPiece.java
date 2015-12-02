@@ -85,14 +85,17 @@ class KoalaPiece extends CharacterPiece {
     
     @Override
     public void move() {
-
+        super.move();
+        
         if (MoveTimer > 1) {
             MoveTimer--;
         } else {
             setMoveTimer();
         }
         
-        super.move();
+        setChanged();
+        notifyObservers();
+        clearChanged();
     }
     
         @Override

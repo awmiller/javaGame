@@ -31,6 +31,7 @@ import map.CharacterPiece;
 import map.GamePiece;
 import map.Map;
 import map.MapView;
+import map.TankPiece;
 import map.Tile;
 
 /**
@@ -110,8 +111,8 @@ public class Game extends JFrame implements Runnable{
         }
         
         bimg = (BufferedImage) getSprite("/res/tank1_strip60.png");
-        player1 = new CharacterPiece(bimg,player1Controller,new Dimension(300,300));
-        player2 = new CharacterPiece(bimg,player2Controller,new Dimension(600,600));
+        player1 = new TankPiece(bimg,player1Controller,new Dimension(300,300));
+        player2 = new TankPiece(bimg,player2Controller,new Dimension(600,600));
         
         
         //player1 = gameMap.add(player1);
@@ -147,31 +148,31 @@ public class Game extends JFrame implements Runnable{
     /**
      * DONT USE THIS MAIN. TANK GAME BROKEN AFTER KOALABR8
      */
-//    public static void main(String args[]) {
-//        if(ENABLE_MUSIC)
-//        try {
-//            URL defaultSound = Game.class.getResource("/res/Music.mid");
-//            //System.out.print("\n"+defaultSound.toString());
-//            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
-////            File soundFile = new File(defaultSound.toURI());
-//            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
-//            Clip clip = AudioSystem.getClip();
-//            clip.open(audioInputStream);
-//            clip.loop(Clip.LOOP_CONTINUOUSLY);
-//        } catch (Exception e) {
-//            System.out.print("\n"+e.toString());
-//        }
-//        
-//        JFrame runner = new Game(TILES_PER_DIMENSION);
-////        runner.pack();
-//        runner.setFocusable(true);
-//        runner.setVisible(true); 
-////        ((Game)runner).otherframe.setVisible(true);
-////        ((Game)runner).otherframe.setFocusable(true);
-//        Thread game = new Thread((Runnable) runner);
-//        game.start();
-//        
-//    }
+    public static void main(String args[]) {
+        if(ENABLE_MUSIC)
+        try {
+            URL defaultSound = Game.class.getResource("/res/Music.mid");
+            //System.out.print("\n"+defaultSound.toString());
+            // getClass().getSy.getResource("/images/ads/WindowsNavigationStart.wav");
+//            File soundFile = new File(defaultSound.toURI());
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(defaultSound);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            System.out.print("\n"+e.toString());
+        }
+        
+        JFrame runner = new Game(TILES_PER_DIMENSION);
+//        runner.pack();
+        runner.setFocusable(true);
+        runner.setVisible(true); 
+//        ((Game)runner).otherframe.setVisible(true);
+//        ((Game)runner).otherframe.setFocusable(true);
+        Thread game = new Thread((Runnable) runner);
+        game.start();
+        
+    }
 
     
     @Override

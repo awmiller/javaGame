@@ -55,9 +55,6 @@ public class KeyController extends KeyAdapter{
                 if(!eventQueue.contains(FIRE_CHAR))
                     eventQueue.push(FIRE_CHAR);
             }
-            if(sz != eventQueue.size()){
-                mModel.onEvent();
-            }
             //System.out.println("KeyPressed!"+ e.getKeyChar());
         }
 
@@ -81,8 +78,6 @@ public class KeyController extends KeyAdapter{
             } else if(code==FIRE_CHAR){
                 if(eventQueue.contains(FIRE_CHAR))
                     eventQueue.remove(FIRE_CHAR);
-            }else{
-                mModel.onEvent();  
             }
 //            System.out.println("KeyReleased!"+ e.getKeyChar());
         }

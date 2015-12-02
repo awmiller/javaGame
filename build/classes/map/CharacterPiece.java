@@ -22,38 +22,19 @@ import java.awt.image.BufferedImage;
 
 public class CharacterPiece extends GamePiece {
     
-    
-    public Dimension CurrentMove= Game.ZERO_VECTOR;
-    private double RADIANS_PER_FRAME = Math.PI/(1*Game.FRAMES_PER_SECOND);
-    private static int epsillon = 20;
-    public static final BufferedImage weaponStrip = Game.getSprite("/res/Weapon_strip3.png");
-    public static final BufferedImage shieldImg = Game.getSprite("/res/Shield1.png");
-    
     protected Dimension topLeft(){
         return new Dimension(Location.width-size.width/2,Location.height-size.height/2);
     }
     
     private int speed;
-    int SpeedDivider = 4;
-    int BoostDuration = 0;
-    private Dimension ThisMove = Game.ZERO_VECTOR;
-    public void boostSpeed(int duration){
-        if(BoostDuration > 0) 
-        {
-            BoostDuration = duration;
-            return;
-        }
-        SpeedDivider = 8;
-        speed = 12;
-        equippedWeapon.attackSpeed=20;
-        BoostDuration = duration;
-    }
+    
     public int setSpeed(int newSpeed){
         speed = newSpeed;
         return speed;
     }
+    public int getSpeed() {return speed;}
     
-    private int maxHealth = 60;
+    protected int maxHealth = 60;
     
     protected int Health;
     public int getHealth() {
@@ -65,12 +46,6 @@ public class CharacterPiece extends GamePiece {
         return Power;
     }
     
-    private int WeaponEquipDuration = 0;
-    private AttackEvent equippedWeapon = AttackEvent.BulletAttack;
-    public void equipWeapon(AttackEvent weapon){
-        equippedWeapon = weapon;
-    }
-
     protected int Armor;
     public void setArmor(int level){
         Armor =level;
@@ -83,9 +58,6 @@ public class CharacterPiece extends GamePiece {
         return Score;
     }
     public final int getScore(){return Score;}
-    
-    private double heading;
-    public final double getHeading(){return heading;}
     
     public int takesDamage(int power){
         int damage = (power-Armor)>0?(power-Armor):0;
@@ -109,11 +81,9 @@ public class CharacterPiece extends GamePiece {
     public CharacterPiece(BufferedImage image,KeyController kc, Dimension location) {
         super(image, location);
         mControlls = kc;
-        mControlls.attach(mcmi);
         speed = 6;
         this.rigid =true;
         Health = maxHealth;
-        CurrentMove = Location;
     }
 
     @Override
@@ -130,102 +100,20 @@ public class CharacterPiece extends GamePiece {
 //        g2d.fillRect(Location.width-size.width/2, Location.height+size.height/2,Health,5);
         g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
     }
-    
-    
- 
-    
-    public AffineTransform rotation = new AffineTransform();
+
     public KeyController mControlls;
-    private KeyController.ControlModelInterface mcmi = new KeyController.ControlModelInterface() {
-        @Override
-        public void onEvent() {          
-        }
-    };
     
     protected int FrameCount = 0;
-    protected int AttackCooldown = 0;
 
     @Override
     public void move() {
-        FrameCount++;
         hasMoved = true;
-        int move = 0;
-        
-        if(AttackCooldown >0){
-            AttackCooldown--;
-        }
-        
-        if(BoostDuration > 0){
-            BoostDuration--;
-            if(BoostDuration<=0){
-                SpeedDivider = 4;
-                BoostDuration=0;
-                speed = 6;
-                equippedWeapon.attackSpeed=0;
-            }
-        }
-        
-        if(WeaponEquipDuration > 0){
-            WeaponEquipDuration--;
-            if(WeaponEquipDuration <=0){
-                WeaponEquipDuration=0;
-                Power = 5;
-                equippedWeapon = AttackEvent.BulletAttack;
-            }
-        }
-        
-        setChanged();
-        notifyObservers();
-        clearChanged();
-    }
-
-    @Override
-    public void onCollide(GamePiece collider) {
-        if(collider instanceof PowerUpPiece){
-            switch(((PowerUpPiece)collider).getType()){
-                case PowerUpPiece.POWER_BOUNCE:
-                    this.Power +=5;
-                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
-                    this.equipWeapon(AttackEvent.BouncingAttack);
-                    break;
-                case PowerUpPiece.POWER_MISSILE:
-                    this.Power +=10;
-                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
-                    this.equipWeapon(AttackEvent.MissileAttack);
-                    break;
-                case PowerUpPiece.POWER_SHIELD:
-                    this.Armor=10;
-                    break;
-                case PowerUpPiece.POWER_TURRET:
-                    Health+= 10; if(Health>maxHealth) Health = maxHealth;
-                    WeaponEquipDuration=0;
-                    Power = 5;
-                    equippedWeapon = AttackEvent.BulletAttack;
-                    break;
-                case PowerUpPiece.POWER_FASTFORWARD:
-                    this.boostSpeed(Game.FRAMES_PER_SECOND*10);
-                    break;
-                case PowerUpPiece.POWER_SUPERBOUNCE:
-                    equippedWeapon = AttackEvent.SuperBouncingAttack;
-                    Power = 30;
-                    this.WeaponEquipDuration = Game.FRAMES_PER_SECOND*10;
-                    break;
-            }
-            collider.onCollide(this);
-        }
-        
     }
     
     @Override
     public void onRespawn(){
         super.onRespawn();
         Health = maxHealth;
-        CurrentMove = Location;
-    }
-    
-    @Override
-    public int collideRadius() {
-        return radius() - epsillon;
     }
 
     @Override
