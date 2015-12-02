@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Andros
  */
-class ProjectilePiece extends GamePiece {
+public class ProjectilePiece extends GamePiece {
 
     private double Heading;
     private int Power;

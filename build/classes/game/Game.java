@@ -5,6 +5,7 @@
  */
 package game;
 
+import map.TankMap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -105,7 +106,7 @@ public class Game extends JFrame implements Runnable{
             //constructor creates a square map with the given side length
             
             URL url = Game.class.getResource("/res/tank1.map");
-            gameMap = new Map("tank1.map");
+            gameMap = new TankMap("tank1.map");
         } catch (Exception ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }

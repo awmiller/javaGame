@@ -5,6 +5,7 @@
  */
 package game;
 
+import map.KoalaMap;
 import static game.Game.controls1;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -98,7 +99,7 @@ public class Koalabr8 implements Runnable{
      * @throws Exception could fail to read the file.
      */
     public void setMap(String mapname) throws Exception{ 
-        gameMap = new Map(mapname);
+        gameMap = new KoalaMap(mapname);
         targetScore = 0;
         while(gameMap.spawnPlayer(new KoalaPiece(KoalaImg,playerController,Game.ZERO_VECTOR))){
             targetScore++;
@@ -359,7 +360,7 @@ public class Koalabr8 implements Runnable{
         mainFrame.addKeyListener(playerController);
         
         
-        String[] levels = new String[]{"Koala5.map", "Koala2.map", "Koala3.map", "Koala4.map", "Koala5.map"};
+        String[] levels = new String[]{"Koala5.map", "Koala4.map", "Koala3.map", "Koala2.map", "Koala1.map"};
         
         for(String map : levels){
             Koalabr8 game = new Koalabr8(map);

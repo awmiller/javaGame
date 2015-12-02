@@ -24,6 +24,7 @@ import java.awt.geom.Area;
 public abstract class GamePiece extends Observable{
     
     protected boolean rigid = false;
+    protected boolean nonRigidCollisions = false;
     protected boolean hasMoved = false;
     public Dimension NextMove = Game.ZERO_VECTOR;
     protected int Respawn =0;

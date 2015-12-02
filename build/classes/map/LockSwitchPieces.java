@@ -39,14 +39,14 @@ class LockSwitchPieces extends GamePiece {
     }
     
     char type;
-    Map mContainer;
+    KoalaMap mContainer;
     int SwitchState = STATE_LEFT;
     private static int STATE_LEFT = 1;
     private static int STATE_RIGHT =2;
     private BufferedImage strip;
     
     
-    public LockSwitchPieces(Dimension dimension, char c, Map map) {
+    public LockSwitchPieces(Dimension dimension, char c, KoalaMap map) {
         super(getImage(c).getSubimage(0, 0, 40, 40),dimension);
         strip = getImage(c);
         switch(c){
@@ -58,6 +58,7 @@ class LockSwitchPieces extends GamePiece {
                 type = 'R';
         }
         mContainer = map;
+        nonRigidCollisions = true;
     }
     
     private LockPiece thisLock;

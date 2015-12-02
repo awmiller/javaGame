@@ -40,7 +40,7 @@ import javax.swing.JComponent;
  *
  * @author awmil_000
  */
-public class Map implements Observer{
+public abstract class Map implements Observer{
     private boolean hasMoved = true;
     
     ArrayList<GamePiece> contents;
@@ -49,58 +49,12 @@ public class Map implements Observer{
     ArrayList<Dimension> playerSpawns = new ArrayList<>();
     ArrayList<Dimension> Exits = new ArrayList<>();
     HashMap<Dimension,Integer> wallSpawns = new HashMap<>();
-        
-    protected ArrayList<Dimension> YellowLocks = new ArrayList<>();
-    protected ArrayList<Dimension> RedLocks = new ArrayList<>();
-    protected ArrayList<Dimension> BlueLocks = new ArrayList<>();
     
-    private int GameScore =0;
-    private int numLocks=0;
-    private int numSwitches=0;
+    protected int GameScore =0;
     public final int getScore() {return GameScore; }
     
     static BufferedImage wall1 = (BufferedImage) Game.getSprite("/res/Wall1.gif");
-    static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");
-    static BufferedImage BotCenterWall;     // ','
-    static BufferedImage LeftCenterWall;    // ']'
-    static BufferedImage TopCenterWall;     // '''
-    static BufferedImage RightCenterWall;   // '['
-    static BufferedImage TopRightWall;      // 'L'
-    static BufferedImage BotRightWall;      // '<'
-    static BufferedImage BotLeftWall;       // '>'
-    static BufferedImage TopLeftWall;       // 'J'
-    static BufferedImage InvTWall;          // 'w'
-    static BufferedImage RightTWall;        // '}'
-    static BufferedImage TWall;             // 'T'
-    static BufferedImage LeftTWall;         // '{'
-    static BufferedImage CenterWall;        // 'o'
-    static BufferedImage allDirWall;        // '+'
-    static BufferedImage TopBotWall;        // '|'
-    static BufferedImage leftRightWall;     // '='
-    
-    public static final Dimension wallDimension = new Dimension(40,40);
-    static{
-        int wd = wallDimension.width;
-        int ht = wallDimension.height;
-        BufferedImage wallStrip = Game.getCompatSprite("/res/kbr8/Wall_tiles.png");
-        BotCenterWall   = wallStrip.getSubimage(0, 0, wd, ht);
-        LeftCenterWall  = wallStrip.getSubimage(1*wd, 0, wd, ht);
-        TopCenterWall   = wallStrip.getSubimage(2*wd, 0, wd, ht);
-        RightCenterWall = wallStrip.getSubimage(3*wd, 0, wd, ht);
-        TopRightWall    = wallStrip.getSubimage(0*wd, 1*ht, wd, ht);
-        BotRightWall    = wallStrip.getSubimage(1*wd, 1*ht, wd, ht);
-        BotLeftWall     = wallStrip.getSubimage(2*wd, 1*ht, wd, ht);
-        TopLeftWall     = wallStrip.getSubimage(3*wd, 1*ht, wd, ht);
-        InvTWall        = wallStrip.getSubimage(0*wd, 2*ht, wd, ht);
-        RightTWall      = wallStrip.getSubimage(1*wd, 2*ht, wd, ht);
-        TWall           = wallStrip.getSubimage(2*wd, 2*ht, wd, ht);
-        LeftTWall       = wallStrip.getSubimage(3*wd, 2*ht, wd, ht);
-        CenterWall      = wallStrip.getSubimage(0*wd, 3*ht, wd, ht);
-        allDirWall      = wallStrip.getSubimage(1*wd, 3*ht, wd, ht);
-        TopBotWall      = wallStrip.getSubimage(2*wd, 3*ht, wd, ht);
-        leftRightWall   = wallStrip.getSubimage(3*wd, 3*ht, wd, ht);
-    }
-    
+    static BufferedImage wall2 = (BufferedImage) Game.getSprite("/res/Wall2.gif");    
     
     public GamePiece add(GamePiece go){
         contents.add(go);
@@ -160,17 +114,6 @@ public class Map implements Observer{
     @Override
     public void update(Observable o, Object arg) { 
         
-//        if(o instanceof CharacterPiece){
-//        
-//            CharacterPiece cp = (CharacterPiece) o;
-//
-//            if(arg instanceof AttackEvent){
-////                ProjectilePiece pjtl = new ProjectilePiece(cp.getHeading(),cp.getPower(),cp.Location);
-//                add(ProjectilePiece.getProjectile((AttackEvent) arg,cp.Location,cp.getHeading()));
-////                System.out.print("\nProjectile Created!");
-//            }
-//        }
-        
         if(o instanceof GamePiece){
             GamePiece gp = (GamePiece)o;
             movePieceIfAble(gp,new MoveEvent(gp.getMove()));
@@ -178,17 +121,7 @@ public class Map implements Observer{
         
     }
     
-    int FrameCount=0;
     public void moveAll(){
-        FrameCount++;
-        
-//        if((FrameCount%(Game.FRAMES_PER_SECOND*8) == 0)
-//                &&(pickupSpawns.size()>0)){
-//            Dimension rem = pickupSpawns.get(
-//                    Math.round((float)Math.random()*(pickupSpawns.size()-1)));
-//            pickupSpawns.remove(rem);
-//            add(PowerUpPiece.getRandom(rem));
-//        }
         
         ArrayList<GamePiece> copy = new ArrayList<>(contents);
         for(GamePiece gp: copy){
@@ -223,14 +156,9 @@ public class Map implements Observer{
                 }
             } else { //Apply non-Rigid collisions to ONLY these types:
                 if (other.isColliding(gamePiece)
-                        && (other instanceof LockSwitchPieces)) {
+                        && (other.nonRigidCollisions)) {
                     other.onCollide(gamePiece);
                 }
-//                if (other.isColliding(gamePiece)
-//                        && (other instanceof SawPiece)) {
-//                    other.onCollide(gamePiece);
-//                    gamePiece.onCollide(other);
-//                }
             }
         }
     }
@@ -340,7 +268,7 @@ public class Map implements Observer{
     private final BufferedReader source;
     public Map(String sourceFile) throws Exception{
         Dimension d;
-        InputStream is = getClass().getResourceAsStream(sourceFile);
+        InputStream is = Map.class.getResourceAsStream(sourceFile);
         InputStreamReader isr = new InputStreamReader(is);
         
         source = new BufferedReader(isr);
@@ -353,31 +281,19 @@ public class Map implements Observer{
          */
         contents = new ArrayList<>();
         /**
-         * initialize background and dimensions
-         */
-        BufferedImage bg = Game.getSprite("/res/kbr8/Background.bmp");
-        corner = new Dimension(bg.getWidth(),bg.getHeight());
-        /**
          * Setup backdrop image
          */
-        background = Game.getCompatImage(background,corner.width,corner.height);
-        Graphics2D gimg = background.createGraphics();
-        gimg.drawImage(bg,0,0,null);
-        gimg.dispose();
-        printout = Game.getCompatImage(printout, corner.width,corner.height);
+        background = createBackground();
+        
         /**
-         * Create the backdrop tiles
+         * setup boundaries
          */
-//        ArrayList<Tile> tiles;
-//        tiles = new ArrayList();
+        corner = new Dimension(background.getWidth(),background.getHeight());
+        
         /**
-         * add tiles to static image
+         * optimize printout image
          */
-//        int area = d.height*d.width;
-//        for(int i = 0; i < area;i++){
-//            tiles.add(Tiles.getRandom());
-//        }   
-//        
+        printout = Game.getCompatImage(printout, corner.width,corner.height);     
         
         //metrics
         System.out.printf("\nMap Size: %d,%d", corner.height, corner.width);
@@ -397,136 +313,10 @@ public class Map implements Observer{
             gp.onStartGame();
         }
     }
+    
+    public abstract BufferedImage createBackground();
 
-    private void createWalls() {
-
-        int fileProgress = 0;
-
-        for (int i = wallDimension.height/2; (i < corner.height) && (fileProgress < ListLines.size());) {
-            String line = ListLines.get(fileProgress);
-            int lineProgress = 0;
-            for (int j = wallDimension.width/2; (j < corner.width) && (lineProgress < line.length());) {
-
-                char c = line.charAt(lineProgress);
-                lineProgress += 1;
-                switch (c) {
-                    
-                    //Force Blank Space
-                    case '.': break;
-                        
-                    case 'P':
-                        playerSpawns.add(new Dimension(j,i));
-                        break;
-                    case 'H':
-                        add(new SawPiece(new Dimension(j,i),SawPiece.HORIZONTAL));
-                        break;
-                    case 'V':
-                        add(new SawPiece(new Dimension(j,i),SawPiece.VERTICAL));
-                        break;
-                        
-                    case 't':
-                        contents.add(new TnTPiece(new Dimension(j,i)));
-                        break;
-                    case 'y':
-                        numLocks++;
-                        YellowLocks.add(new Dimension(j,i));
-                        break;
-                    case 'r':
-                        RedLocks.add(new Dimension(j,i));
-                        numLocks++;
-                        break;
-                    case 'b':
-                        BlueLocks.add(new Dimension(j,i));
-                        numLocks++;
-                        break;
-                        
-                    case 'R':
-                    case 'Y':
-                    case 'B':
-                        numSwitches++;
-                        contents.add(new LockSwitchPieces(new Dimension(j,i),c,this));
-                        break;
-                    case 's':
-                        contents.add(new StonePiece(new Dimension(j,i),this));
-                        break;
-                    case 'e':
-                        Dimension dim = new Dimension(j,i);
-                        Exits.add(dim);
-                        contents.add(new ExitPiece(dim));
-                        break;
-//      BotCenterWall;     // 
-                    case ',':
-                        contents.add(new ObstaclePiece(BotCenterWall,new Dimension(j,i)));
-                        break;
-//      LeftCenterWall;    // 
-                    case ']':
-                        contents.add(new ObstaclePiece(LeftCenterWall,new Dimension(j,i)));
-                        break;
-//      TopCenterWall;     // 
-                    case '\'':
-                        contents.add(new ObstaclePiece(TopCenterWall,new Dimension(j,i)));
-                        break;
-//      RightCenterWall;   // 
-                    case '[':
-                        contents.add(new ObstaclePiece(RightCenterWall,new Dimension(j,i)));
-                        break;
-//      TopRightWall;      // 
-                    case 'L':
-                        contents.add(new ObstaclePiece(TopRightWall,new Dimension(j,i)));
-                        break;
-//      BotRightWall;      // 
-                    case '<':
-                        contents.add(new ObstaclePiece(BotRightWall,new Dimension(j,i)));
-                        break;
-//      BotLeftWall;       // 
-                    case '>':
-                        contents.add(new ObstaclePiece(BotLeftWall,new Dimension(j,i)));
-                        break;
-//      TopLeftWall;       // 
-                    case 'J':
-                        contents.add(new ObstaclePiece(TopLeftWall,new Dimension(j,i)));
-                        break;
-//      InvTWall;          // 
-                    case 'w':
-                        contents.add(new ObstaclePiece(InvTWall,new Dimension(j,i)));
-                        break;
-//      RightTWall;        // 
-                    case '}':
-                        contents.add(new ObstaclePiece(RightTWall,new Dimension(j,i)));
-                        break;
-//      TWall;             // 
-                    case 'T':
-                        contents.add(new ObstaclePiece(TWall,new Dimension(j,i)));
-                        break;
-//      LeftTWall;         // 
-                    case '{':
-                        contents.add(new ObstaclePiece(LeftTWall,new Dimension(j,i)));
-                        break;
-//      CenterWall;        // 
-                    case 'o':
-                        contents.add(new ObstaclePiece(CenterWall,new Dimension(j,i)));
-                        break;
-//      allDirWall;        // 
-                    case '+':
-                        contents.add(new ObstaclePiece(allDirWall,new Dimension(j,i)));
-                        break;
-//      TopBotWall;        // 
-                    case '|':
-                        contents.add(new ObstaclePiece(TopBotWall,new Dimension(j,i)));
-                        break;
-//      leftRightWall;     // 
-                    case '=':
-                        contents.add(new ObstaclePiece(leftRightWall,new Dimension(j,i)));
-                        break;
-                            
-                }
-
-                j += wallDimension.width;
-            }
-            i += wallDimension.height;
-            fileProgress += 1;
-        }
-    }
+    public abstract void createWalls();
 
     private BufferedImage printout;
     
@@ -631,4 +421,6 @@ public class Map implements Observer{
 //                add(player);
         
     }
+
+   
 }
