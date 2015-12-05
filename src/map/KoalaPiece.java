@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package game;
+package map;
 
+import game.Game;
+import game.KeyController;
 import game.KeyController;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -18,7 +20,7 @@ import map.KoalaAnimator;
  *
  * @author awmil_000
  */
-class KoalaPiece extends CharacterPiece {
+public class KoalaPiece extends CharacterPiece {
 
     public KoalaPiece(BufferedImage KoalaImg, KeyController playerController, Dimension location) {
         super(KoalaImg,playerController,location);

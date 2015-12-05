@@ -5,6 +5,7 @@
  */
 package game;
 
+import map.KoalaPiece;
 import map.KoalaMap;
 import static game.Game.controls1;
 import java.awt.Color;
