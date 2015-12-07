@@ -57,7 +57,7 @@ class ExplosionAnimation extends GamePiece {
     int FrameCount=0;
     int stripx =0;
     int stripinc;
-    static int FrameDivider = 12;
+    static int FrameDivider = 40;
     
     @Override
     public void move() {

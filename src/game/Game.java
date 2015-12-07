@@ -42,7 +42,7 @@ import map.Tile;
 public class Game extends JFrame implements Runnable{
     public static Dimension ZERO_VECTOR = new Dimension(0,0);
     public static AffineTransform ZERO_ROTATION = new AffineTransform();
-    public static int FRAMES_PER_SECOND = 30;
+    public static int FRAMES_PER_SECOND = 120;
     private static double FRAME_PERIOD_MILLIS = (1000/Game.FRAMES_PER_SECOND);
     private long framePeriod;
     public static boolean DRAW_DEBUG_LINES = false;

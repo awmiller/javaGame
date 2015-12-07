@@ -62,8 +62,8 @@ public abstract class GamePiece extends Observable{
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(Image,Location.width-size.width/2, Location.height-size.height/2,(ImageObserver)null);
-        g2d.setColor(Color.RED);
-        g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
+//        g2d.setColor(Color.RED);
+//        g2d.drawRect(Location.width-size.width/2, Location.height-size.height/2, size.width, size.height);
     }
 
     boolean isRigid() {

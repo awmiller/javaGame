@@ -61,7 +61,7 @@ public class Koalabr8 implements Runnable{
     /**
      * Frame Rate and Sampling period
      */
-    public static int FRAMES_PER_SECOND = 120;
+    public static int FRAMES_PER_SECOND = 100;
     private static double FRAME_PERIOD_MILLIS = (1000/FRAMES_PER_SECOND);
     
     /**
@@ -361,7 +361,7 @@ public class Koalabr8 implements Runnable{
         mainFrame.addKeyListener(playerController);
         
         
-        String[] levels = new String[]{"Koala5.map", "Koala4.map", "Koala3.map", "Koala2.map", "Koala1.map"};
+        String[] levels = new String[]{"Koala1.map", "Koala2.map", "Koala3.map", "Koala4.map", "Koala5.map"};
         
         for(String map : levels){
             Koalabr8 game = new Koalabr8(map);
